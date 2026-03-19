@@ -11,7 +11,7 @@ const NAV = [
 
 export default function Layout() {
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#0a0e1a' }}>
+    <div style={{ display: 'flex', minHeight: '100vh', background: '#0C0C0C' }}>
       {/* Sidebar */}
       <aside style={{
         width: 220, background: '#111111', borderRight: '1px solid #1f2937',
@@ -21,7 +21,7 @@ export default function Layout() {
         <div style={{ margin: '0 auto', padding: '20px 16px', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center', gap: 10 }}>
           {/* <Shield size={22} color="#00d4ff" /> */}
           <div>
-            <div style={{ fontFamily: 'KyivType Sans', fontSize: 35, fontWeight: 700, color: '#f0f0f0', letterSpacing: 1 }}>NTSEIEI</div>
+            <div style={{ fontFamily: 'fantasy', fontSize: 35, fontWeight: 700, color: '#f0f0f0', letterSpacing: 4 }}>NTSeiei</div>
             <div style={{ fontSize: 10, color: '#6b7280', letterSpacing: 2 }}>PLATFORM v3.0</div>
           </div>
         </div>
@@ -42,18 +42,11 @@ export default function Layout() {
               padding: '10px 16px', textDecoration: 'none',
               fontSize: 14, fontWeight: 300,
               color: isActive ? '#ffffff' : '#9ca3af',
-              background: isActive ? 'linear-gradient(to left, rgba(16, 0, 247, 0.37), rgba(53, 53, 69, 0.18))' : 'transparent',
-              borderRight: isActive ? '1px solid #0044ff' : '2px solid transparent',
+              background: isActive ? 'linear-gradient(to left, rgba(16, 0, 247, 0.37), rgba(53, 53, 69, 0.18),rgba(53, 53, 69, 0.18))' : 'transparent',
+              borderRight: isActive ? '1px solid #0044ff' : '3px solid transparent',
+              borderRadius: isActive ? '0px 20px 20px 0' : '8px',
               transition: 'all 0.15s',
             })}>
-              <div
-                style={({ isActive }) => ({
-                  width: '3px',
-                  height: '12px',
-                  borderRadius: '50%',
-                  backgroundColor: isActive ? '#0044ff' : 'transparent',
-                  marginLeft: '4px',
-                })}/>
               <Icon size={15} />
               {label}
             </NavLink>
@@ -68,7 +61,7 @@ export default function Layout() {
       </aside>
 
       {/* Main */}
-      <main style={{ flex: 1, overflow: 'auto', background: '#0a0e1a' }}>
+      <main style={{ flex: 1, overflow: 'auto', background: '#0C0C0C' }}>
         <Outlet />
       </main>
     </div>

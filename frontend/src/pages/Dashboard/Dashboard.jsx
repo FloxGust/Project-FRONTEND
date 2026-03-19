@@ -19,7 +19,7 @@ const SEVERITY_DATA = [
 
 function StatCard({ icon: Icon, label, value, color, sub }) {
   return (
-    <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+    <div style={{ background: '#181818', border: '1px solid #383838', borderRadius: 8, padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: 4 }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
         <div>
           <div style={{ fontSize: 11, color: '#6b7280', letterSpacing: 1, textTransform: 'uppercase', fontFamily: 'JetBrains Mono, monospace' }}>{label}</div>
@@ -63,7 +63,7 @@ export default function Dashboard() {
 
       {/* Charts row */}
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: 16, marginBottom: 24 }}>
-        <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
+        <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
           <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: 'JetBrains Mono, monospace', marginBottom: 16 }}>ALERT VOLUME — 24H</div>
           <ResponsiveContainer width="100%" height={160}>
             <LineChart data={TREND}>
@@ -74,7 +74,7 @@ export default function Dashboard() {
             </LineChart>
           </ResponsiveContainer>
         </div>
-        <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
+        <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
           <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: 'JetBrains Mono, monospace', marginBottom: 16 }}>BY SEVERITY</div>
           <ResponsiveContainer width="100%" height={160}>
             <BarChart data={SEVERITY_DATA} layout="vertical">
@@ -92,11 +92,11 @@ export default function Dashboard() {
       </div>
 
       {/* Agent status strip */}
-      <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 16 }}>
+      <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, padding: 16 }}>
         <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: 'JetBrains Mono, monospace', marginBottom: 12 }}>AGENT STATUS</div>
         <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
           {['Auto-Triage', 'Investigation', 'Threat Hunt', 'IOC Enrich', 'Report Gen'].map((name, i) => (
-            <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#0d1117', borderRadius: 6, padding: '6px 12px', border: '1px solid #1f2937' }}>
+            <div key={name} style={{ display: 'flex', alignItems: 'center', gap: 8, background: '#181818', borderRadius: 6, padding: '6px 12px', border: '1px solid #1f2937' }}>
               <Bot size={13} color="#00d4ff" />
               <span style={{ fontSize: 12, color: '#d1d5db' }}>{name}</span>
               <span style={{ fontSize: 10, color: '#00d48a', fontFamily: 'JetBrains Mono, monospace' }}>READY</span>

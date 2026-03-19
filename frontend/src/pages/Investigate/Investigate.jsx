@@ -51,7 +51,7 @@ export default function Investigate() {
       </div>
 
       {/* Target input */}
-      <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 20, marginBottom: 16 }}>
+      <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, padding: 20, marginBottom: 16 }}>
         <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: 'JetBrains Mono, monospace', marginBottom: 12 }}>TARGET</div>
         <div style={{ display: 'flex', gap: 10 }}>
           <select value={iocType} onChange={e => setIocType(e.target.value)} style={{ background: '#0d1117', border: '1px solid #1f2937', color: '#9ca3af', borderRadius: 6, padding: '0 12px', fontSize: 12, fontFamily: 'JetBrains Mono, monospace', cursor: 'pointer' }}>
@@ -72,7 +72,7 @@ export default function Investigate() {
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
         {/* Agent Result */}
-        <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
+        <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
           <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: 'JetBrains Mono, monospace', marginBottom: 16 }}>INVESTIGATION AGENT</div>
           {!job && !loading && <div style={{ color: '#374151', fontSize: 13, textAlign: 'center', padding: '40px 0' }}>No investigation started yet</div>}
           {(loading || job) && (
@@ -105,7 +105,7 @@ export default function Investigate() {
         </div>
 
         {/* IOC Enrichment */}
-        <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
+        <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, padding: 20 }}>
           <div style={{ fontSize: 12, color: '#9ca3af', fontFamily: 'JetBrains Mono, monospace', marginBottom: 16 }}>IOC ENRICHMENT</div>
           {!enrich && <div style={{ color: '#374151', fontSize: 13, textAlign: 'center', padding: '40px 0' }}>No enrichment data yet</div>}
           {enrich && (

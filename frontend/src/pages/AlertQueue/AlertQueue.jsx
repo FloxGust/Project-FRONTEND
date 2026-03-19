@@ -64,19 +64,19 @@ export default function AlertQueue() {
 
       {/* Filters */}
       <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
-        <div style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', gap: 8, background: '#111827', border: '1px solid #1f2937', borderRadius: 6, padding: '0 12px' }}>
+        <div style={{ flex: 1, minWidth: 200, display: 'flex', alignItems: 'center', gap: 8, background: '#181818', border: '1px solid #1f2937', borderRadius: 6, padding: '0 12px' }}>
           <Search size={13} color="#6b7280" />
           <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search alerts, IPs..." style={{ background: 'none', border: 'none', outline: 'none', color: '#e5e7eb', fontSize: 13, padding: '9px 0', width: '100%' }} />
         </div>
         {['all', 'critical', 'high', 'medium', 'open', 'escalated'].map(f => (
-          <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5, background: filter === f ? '#00d4ff18' : '#111827', color: filter === f ? '#00d4ff' : '#6b7280', border: filter === f ? '1px solid #00d4ff40' : '1px solid #1f2937' }}>
+          <button key={f} onClick={() => setFilter(f)} style={{ padding: '7px 14px', borderRadius: 6, fontSize: 12, cursor: 'pointer', fontFamily: 'JetBrains Mono, monospace', textTransform: 'uppercase', letterSpacing: 0.5, background: filter === f ? '#00d4ff18' : '#181818', color: filter === f ? '#00d4ff' : '#6b7280', border: filter === f ? '1px solid #00d4ff40' : '1px solid #1f2937' }}>
             {f}
           </button>
         ))}
       </div>
 
       {/* Alert table */}
-      <div style={{ background: '#111827', border: '1px solid #1f2937', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #1f2937' }}>

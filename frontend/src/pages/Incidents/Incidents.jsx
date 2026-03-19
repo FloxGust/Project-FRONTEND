@@ -39,7 +39,7 @@ export default function Incidents() {
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace', letterSpacing: 2, textTransform: 'uppercase' }}>CASE MANAGEMENT</div>
-          <h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 600, color: '#f9fafb' }}>Incidents</h1>
+          <h1 style={{ margin: '4px 0 0', fontSize: 28, fontFamily: 'JetBrains Mono, monospace', fontWeight: 300, color: '#f9fafb' }}>Incidents</h1>
         </div>
         <button onClick={() => setShowCreate(true)} style={{ display: 'flex', alignItems: 'center', gap: 6, background: '#00d4ff18', border: '1px solid #00d4ff40', color: '#00d4ff', borderRadius: 6, padding: '8px 16px', cursor: 'pointer', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
           <Plus size={13} /> NEW INCIDENT

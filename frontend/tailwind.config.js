@@ -5,8 +5,8 @@ export default {
     extend: {
       colors: {
         soc: {
-          bg:       '#0a0e1a',
-          surface:  '#111827',
+          bg:       '#000000',
+          surface:  '#000000',
           border:   '#1f2937',
           accent:   '#00d4ff',
           critical: '#ff3b3b',
