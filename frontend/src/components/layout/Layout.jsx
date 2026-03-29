@@ -1,7 +1,9 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
-import { Shield, LayoutDashboard, Bell, Search, Bot, FileWarning, Activity } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { LayoutDashboard, Bell, Search, Bot, FileWarning, Activity, Home } from 'lucide-react'
 
 const NAV = [
+  { to: '/home', icon: Home, label: 'Home' },
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/alerts', icon: Bell, label: 'Alert Queue' },
   { to: '/investigate', icon: Search, label: 'Investigate' },
@@ -10,30 +12,48 @@ const NAV = [
 ]
 
 export default function Layout() {
+  const location = useLocation()
+  const isHome = location.pathname === '/home'
+
+  const [sidebarVisible, setSidebarVisible] = useState(!isHome)
+  const [hover, setHover] = useState(false)
+
+  useEffect(() => {
+    setSidebarVisible(!isHome)
+  }, [isHome])
+
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#0C0C0C' }}>
+    <div style={{ display: 'flex', height: '100vh', background: '#0C0C0C' }}>
+
       {/* Sidebar */}
       <aside style={{
-        width: 220, background: '#111111', borderRight: '1px solid #1f2937',
-        display: 'flex', flexDirection: 'column', flexShrink: 0,
+        width: sidebarVisible ? 220 : 0,
+        background: '#111',
+        transition: 'width 0.3s ease',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {/* Logo */}
-        <div style={{ margin: '0 auto', padding: '20px 16px', borderBottom: '1px solid #1f2937', display: 'flex', alignItems: 'center', gap: 10 }}>
-          {/* <Shield size={22} color="#00d4ff" /> */}
-          <div>
-            <div style={{ fontFamily: 'fantasy', fontSize: 35, fontWeight: 700, color: '#f0f0f0', letterSpacing: 4 }}>NTSeiei</div>
-            <div style={{ fontSize: 10, color: '#6b7280', letterSpacing: 2 }}>PLATFORM v3.0</div>
+        <div style={{
+          padding: '20px 16px',
+          borderBottom: '1px solid #1f2937'
+        }}>
+          <div style={{
+            fontFamily: 'fantasy',
+            fontSize: 28,
+            color: '#f0f0f0',
+            letterSpacing: 3
+          }}>
+            PearlGuard
+          </div>
+          <div style={{ fontSize: 10, color: '#6b7280' }}>
+            PLATFORM v3.0
           </div>
         </div>
 
-        {/* Live indicator */}
-        {/* <div style={{ padding: '8px 16px', display: 'flex', alignItems: 'center', gap: 6, borderBottom: '1px solid #1f2937' }}>
-          <span className="live-dot" style={{ width: 6, height: 6, borderRadius: '50%', background: '#00d48a', display: 'inline-block' }} />
-          <span style={{ fontSize: 10, color: '#00d48a', fontFamily: 'JetBrains Mono, monospace', letterSpacing: 1 }}>LIVE MONITORING</span>
-        </div> */}
-
         {/* Nav */}
-        <nav style={{ padding: '19px 0', flex: 1 }}>
+        <nav style={{ padding: '10px 0', flex: 1 }}>
           {NAV.map(({ to, icon: Icon, label }) => (
             <NavLink key={to} to={to} style={({ isActive }) => ({
               display: 'flex', alignItems: 'center', gap: 15,
@@ -54,16 +74,86 @@ export default function Layout() {
         </nav>
 
         {/* Footer */}
-        <div style={{ padding: '12px 16px', borderTop: '1px solid #1f2937', fontSize: 10, color: '#374151', fontFamily: 'JetBrains Mono, monospace' }}>
-          <Activity size={10} style={{ display: 'inline', marginRight: 4 }} />
-          API: localhost:8000
+        <div style={{
+          padding: 12,
+          borderTop: '1px solid #1f2937',
+          fontSize: 10,
+          color: '#374151'
+        }}>
+          <Activity size={12} style={{ marginRight: 4 }} />
+          API: http://127.0.0.1:8000
         </div>
       </aside>
 
-      {/* Main */}
-      <main style={{ flex: 1, overflow: 'auto', background: '#0C0C0C' }}>
-        <Outlet />
-      </main>
+      {/* Content */}
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+
+        {/* 🔥 Floating Hamburger */}
+        <button
+          onClick={() => setSidebarVisible(!sidebarVisible)}
+          onMouseEnter={() => setHover(true)}
+          onMouseLeave={() => setHover(false)}
+          style={{
+            position: 'fixed',
+            bottom: 5,
+            left: 200,
+            zIndex: 50,
+
+            width: 42,
+            height: 42,
+            borderRadius: 12,
+            border: '1px solid #1f2937',
+
+            background: hover ? '#1f2937' : '#111',
+            cursor: 'pointer',
+
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            gap: 5,
+
+            transition: 'all 0.25s ease',
+            boxShadow: '0 0 12px rgba(0,0,0,0.5)'
+          }}
+        >
+          {/* Top */}
+          <span style={{
+            width: 18,
+            height: 2,
+            background: '#fff',
+            transform: sidebarVisible ? 'rotate(45deg) translateY(6px)' : 'none',
+            transition: '0.3s'
+          }} />
+
+          {/* Middle */}
+          <span style={{
+            width: 18,
+            height: 2,
+            background: '#fff',
+            opacity: sidebarVisible ? 0 : 1,
+            transition: '0.3s'
+          }} />
+
+          {/* Bottom */}
+          <span style={{
+            width: 18,
+            height: 2,
+            background: '#fff',
+            transform: sidebarVisible ? 'rotate(-45deg) translateY(-6px)' : 'none',
+            transition: '0.3s'
+          }} />
+        </button>
+
+        {/* Main */}
+        <main style={{
+          flex: 1,
+          overflow: 'auto',
+          padding: 20
+        }}>
+          <Outlet />
+        </main>
+      </div>
     </div>
   )
 }

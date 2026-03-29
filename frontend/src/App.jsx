@@ -5,13 +5,15 @@ import AlertQueue from './pages/AlertQueue/AlertQueue'
 import Investigate from './pages/Investigate/Investigate'
 import AgentOrchestrator from './pages/AgentOrchestrator/AgentOrchestrator'
 import Incidents from './pages/Incidents/Incidents'
+import Home from './pages/Home/Home'
 
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<Navigate to="/dashboard" replace />} />
+          <Route index element={<Navigate to="/home" replace />} />
+          <Route path="home" element={<Home />} />
           <Route path="dashboard"   element={<Dashboard />} />
           <Route path="alerts"      element={<AlertQueue />} />
           <Route path="investigate/:alertId?" element={<Investigate />} />
