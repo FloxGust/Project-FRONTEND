@@ -6,6 +6,7 @@ import Investigate from './pages/Investigate/Investigate'
 import AgentOrchestrator from './pages/AgentOrchestrator/AgentOrchestrator'
 import Incidents from './pages/Incidents/Incidents'
 import Home from './pages/Home/Home'
+import AboutUs from './pages/AboutUs/AboutUs'
 
 export default function App() {
   return (
@@ -19,6 +20,7 @@ export default function App() {
           <Route path="investigate/:alertId?" element={<Investigate />} />
           <Route path="agents"      element={<AgentOrchestrator />} />
           <Route path="incidents"   element={<Incidents />} />
+          <Route path="about-us"    element={<AboutUs />} />
         </Route>
       </Routes>
     </BrowserRouter>

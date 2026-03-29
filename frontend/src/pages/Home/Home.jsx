@@ -9,24 +9,24 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#020b1f] to-[#020617] text-white">
+    <div className="min-h-screen bg-gradient-to-br from-[#020617] via-[#020b1f] to-[#020617] text-white" style={{ borderRadius: '30px',border: '1px solid #1f2937', padding: '40px' }}>
       {/* glow background */}
-      <div className="absolute inset-0 overflow-hidden" style={{ zIndex: -1 }}>
-        <div className="absolute -top-20 left-1/4 h-[400px] w-[400px] rounded-full bg-cyan-400/10 blur-[120px]" />
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-20 left-1/4 h-[400px] w-[400px] rounded-full bg-cyan-500/30 blur-[100px]" />
         <div className="absolute bottom-0 right-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/10 blur-[120px]" />
       </div>
 
       {/* navbar */}
-      <header className="relative z-10 flex items-center justify-between px-10 py-0">
+      <header className="relative z-10 flex items-center justify-between px-10 py-5">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-gradient-to-br from-white to-cyan-300 shadow-[0_0_40px_rgba(56,189,248,0.6)]" />
           <span className="text-lg font-semibold tracking-wide">PearlGuard</span>
         </div>
 
         <div className="flex gap-8 text-sm text-cyan-100/70">
-          <span onClick={() => navigate('/dashboard')} className="hover:text-white cursor-pointer">Platform</span>
-          <span onClick={() => navigate('/alerts')} className="hover:text-white cursor-pointer">Solutions</span>
-          <span onClick={() => navigate('/incidents')} className="hover:text-white cursor-pointer">Pricing</span>
+          <span onClick={() => navigate('/dashboard')} className="hover:text-white cursor-pointer">Solutions</span>
+          <span onClick={() => navigate('/alerts')} className="hover:text-white cursor-pointer">Dashbord</span>
+          <span onClick={() => navigate('/about-us')} className="hover:text-white cursor-pointer">About Us</span>
         </div>
 
         <button onClick={() => navigate('/dashboard')} className="rounded-full bg-gradient-to-r from-cyan-300 to-blue-500 px-5 py-2 text-black font-medium shadow-lg">
@@ -37,15 +37,14 @@ export default function Home() {
       {/* hero */}
       <section className="relative z-10 px-10 pt-20 pb-16">
         <h1 className="text-6xl font-semibold leading-tight max-w-4xl">
-          Luxury Cybersecurity
+          Cybersecurity
           <span className="block bg-gradient-to-r from-white via-cyan-200 to-blue-400 bg-clip-text text-transparent">
             powered by AI intelligence
           </span>
         </h1>
 
         <p className="mt-6 text-slate-300 max-w-2xl">
-          UI โทนหรู + futuristic สำหรับบริษัท cyber ที่ต้องการภาพลักษณ์ premium
-          ใช้ neon blue + glow + glass เพื่อให้ดู advanced และน่าเชื่อถือ
+          ____________________________________________
         </p>
 
         <div className="mt-8 flex gap-4">

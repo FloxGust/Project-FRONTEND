@@ -48,7 +48,7 @@ export default function Layout() {
             PearlGuard
           </div>
           <div style={{ fontSize: 10, color: '#6b7280' }}>
-            PLATFORM v3.0
+            PLATFORM v1.0
           </div>
         </div>
 
@@ -79,9 +79,12 @@ export default function Layout() {
           borderTop: '1px solid #1f2937',
           fontSize: 10,
           color: '#374151'
+          
         }}>
-          <Activity size={12} style={{ marginRight: 4 }} />
-          API: http://127.0.0.1:8000
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4,marginTop: 4 }} >
+            <Activity size={12} style={{ marginRight: 4}} />
+            API: http://127.0.0.1:8000
+          </div>
         </div>
       </aside>
 
@@ -95,16 +98,16 @@ export default function Layout() {
           onMouseLeave={() => setHover(false)}
           style={{
             position: 'fixed',
-            bottom: 5,
-            left: 200,
+            bottom: 55,
+            left: 10,
             zIndex: 50,
 
             width: 42,
-            height: 42,
+            height: 160,
             borderRadius: 12,
             border: '1px solid #1f2937',
 
-            background: hover ? '#1f2937' : '#111',
+            background: hover ? '#1f2937' : 'none',
             cursor: 'pointer',
 
             display: 'flex',
@@ -119,16 +122,16 @@ export default function Layout() {
         >
           {/* Top */}
           <span style={{
-            width: 18,
+            width: 20,
             height: 2,
             background: '#fff',
-            transform: sidebarVisible ? 'rotate(45deg) translateY(6px)' : 'none',
+            transform: sidebarVisible ? 'rotate(45deg) translateY(1px)' : 'none',
             transition: '0.3s'
           }} />
 
           {/* Middle */}
           <span style={{
-            width: 18,
+            width: 20,
             height: 2,
             background: '#fff',
             opacity: sidebarVisible ? 0 : 1,
@@ -137,10 +140,10 @@ export default function Layout() {
 
           {/* Bottom */}
           <span style={{
-            width: 18,
+            width: 20,
             height: 2,
             background: '#fff',
-            transform: sidebarVisible ? 'rotate(-45deg) translateY(-6px)' : 'none',
+            transform: sidebarVisible ? 'rotate(-220deg) translateY(2px)' : 'none',
             transition: '0.3s'
           }} />
         </button>
