@@ -21,6 +21,11 @@ export default defineConfig({
         target: 'http://backend:8000',
         changeOrigin: true,
       },
+      '/agent-queue-proxy': {
+        target: 'http://192.168.1.9:8000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/agent-queue-proxy/, ''),
+      },
       '/ws': {
         target: 'ws://backend:8000',
         ws: true,

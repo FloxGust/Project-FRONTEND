@@ -1,4 +1,14 @@
+import axios from 'axios'
 import client from './client'
+
+const AGENT_QUEUE_BASE_URL = (import.meta.env.VITE_AGENT_QUEUE_BASE_URL || '/agent-queue-proxy').replace(/\/+$/, '')
+const AGENT_QUEUE_PATH = '/api/agent-queue'
+const buildAgentQueueUrl = (queueId) => queueId
+  ? `${AGENT_QUEUE_BASE_URL}${AGENT_QUEUE_PATH}/${encodeURIComponent(queueId)}`
+  : `${AGENT_QUEUE_BASE_URL}${AGENT_QUEUE_PATH}/`
+const agentQueueClient = axios.create({
+  timeout: 15000,
+})
 
 // --- Alerts ---
 export const alertsApi = {
@@ -14,6 +24,16 @@ export const agentsApi = {
   listJobs:  ()       => client.get('/api/agents/jobs'),
   run:       (body)   => client.post('/api/agents/run', body),
   getJob:    (jobId)  => client.get(`/api/agents/jobs/${jobId}`),
+}
+
+// --- Agent Queue ---
+export const agentQueueApi = {
+  list:   (params)         => agentQueueClient.get(buildAgentQueueUrl(), { params }),
+  search: (params)         => agentQueueClient.get(buildAgentQueueUrl(), { params }),
+  create: (body)           => agentQueueClient.post(buildAgentQueueUrl(), body),
+  get:    (queueId)        => agentQueueClient.get(buildAgentQueueUrl(queueId)),
+  update: (queueId, body)  => agentQueueClient.put(buildAgentQueueUrl(queueId), body),
+  remove: (queueId)        => agentQueueClient.delete(buildAgentQueueUrl(queueId)),
 }
 
 // --- Incidents ---
