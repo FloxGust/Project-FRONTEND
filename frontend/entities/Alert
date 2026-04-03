@@ -1,0 +1,120 @@
+{
+  "name": "Alert",
+  "type": "object",
+  "properties": {
+    "alert_id": {
+      "type": "string",
+      "description": "Unique alert identifier"
+    },
+    "alert_name": {
+      "type": "string",
+      "description": "Name/title of the alert"
+    },
+    "severity": {
+      "type": "string",
+      "enum": [
+        "Critical",
+        "High",
+        "Medium",
+        "Low"
+      ],
+      "description": "Alert severity level"
+    },
+    "alert_status": {
+      "type": "string",
+      "enum": [
+        "Open",
+        "In Progress",
+        "Closed"
+      ],
+      "description": "Current status of the alert"
+    },
+    "case_result": {
+      "type": "string",
+      "enum": [
+        "True Positive",
+        "False Positive",
+        "Pending"
+      ],
+      "description": "Analysis result classification"
+    },
+    "log_source": {
+      "type": "string",
+      "description": "Source of the log (firewall, edr, siem, etc.)"
+    },
+    "detected_time": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Time the alert was detected"
+    },
+    "contexts": {
+      "type": "object",
+      "description": "Context data including IPs, user, hostname, etc.",
+      "properties": {
+        "src_ip": {
+          "type": "string"
+        },
+        "dest_ip": {
+          "type": "string"
+        },
+        "user": {
+          "type": "string"
+        },
+        "hostname": {
+          "type": "string"
+        },
+        "os": {
+          "type": "string"
+        },
+        "endpoint_type": {
+          "type": "string"
+        },
+        "geo": {
+          "type": "string"
+        },
+        "historical_pattern": {
+          "type": "string"
+        }
+      }
+    },
+    "sla": {
+      "type": "object",
+      "description": "SLA tracking metrics in minutes",
+      "properties": {
+        "mttd": {
+          "type": "number",
+          "description": "Mean time to detect (minutes)"
+        },
+        "mtta": {
+          "type": "number",
+          "description": "Mean time to acknowledge (minutes)"
+        },
+        "mttr": {
+          "type": "number",
+          "description": "Mean time to respond (minutes)"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Tags like phishing, brute-force, malware"
+    },
+    "assigned_to": {
+      "type": "string",
+      "description": "Analyst assigned to this alert"
+    },
+    "raw_log": {
+      "type": "string",
+      "description": "Raw log data"
+    }
+  },
+  "required": [
+    "alert_id",
+    "alert_name",
+    "severity",
+    "alert_status"
+  ]
+}
