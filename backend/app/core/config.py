@@ -22,6 +22,10 @@ class Settings(BaseSettings):
     AGENT_MAX_CONCURRENT: int = 5
     AGENT_TIMEOUT_SECONDS: int = 300
 
+    PAIAC_BASE_URL: str = "https://db.paiac.store"
+    PAIAC_API_PREFIX: str = ""
+    PAIAC_TIMEOUT_SECONDS: int = 20
+
     VIRUSTOTAL_API_KEY: str = ""
     SHODAN_API_KEY: str = ""
 

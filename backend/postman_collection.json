@@ -1,62 +1,46 @@
 {
   "info": {
-    "_postman_id": "d8c4c2fb-1b3a-4c41-9b20-6b32c5cdb001",
-    "name": "PostgreSQL Alert Log API",
-    "description": "Postman collection for FastAPI CRUD and search endpoints over PostgreSQL alert log tables.",
+    "_postman_id": "b22dfc62-a1ad-43cf-9be8-818ecdb31eb9",
+    "name": "PAIAC DB API (Public)",
+    "description": "Postman collection for public PAIAC database API endpoints. Default base URL is https://db.paiac.store. If your gateway requires /api prefix, set api_prefix to /api.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     {
       "key": "base_url",
-      "value": "http://127.0.0.1:8000"
+      "value": "https://db.paiac.store"
     },
     {
-      "key": "meta_id",
-      "value": "11111111-1111-1111-1111-111111111111"
+      "key": "api_prefix",
+      "value": ""
     },
     {
-      "key": "result_id",
-      "value": "11111111-1111-1111-1111-111111111111"
+      "key": "trace_id",
+      "value": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "key": "alert_id",
+      "value": "1"
     },
     {
       "key": "prediction_id",
-      "value": "22222222-2222-2222-2222-222222222222"
+      "value": "1"
+    },
+    {
+      "key": "context_id",
+      "value": "1"
     },
     {
       "key": "investigation_id",
-      "value": "33333333-3333-3333-3333-333333333333"
+      "value": "1"
     },
     {
-      "key": "queue_id",
-      "value": "44444444-4444-4444-4444-444444444444"
+      "key": "recommendation_id",
+      "value": "1"
     },
     {
-      "key": "process_time",
-      "value": "2026-03-23T10:30:00Z"
-    },
-    {
-      "key": "sent_at",
-      "value": "2026-03-23T11:00:00Z"
-    },
-    {
-      "key": "process_time_from",
-      "value": "2026-03-01T00:00:00Z"
-    },
-    {
-      "key": "process_time_to",
-      "value": "2026-03-31T23:59:59Z"
-    },
-    {
-      "key": "sent_at_from",
-      "value": "2026-03-01T00:00:00Z"
-    },
-    {
-      "key": "sent_at_to",
-      "value": "2026-03-31T23:59:59Z"
-    },
-    {
-      "key": "log_id",
-      "value": "LOG-001"
+      "key": "external_alert_id",
+      "value": "MOCK-2503-100001"
     }
   ],
   "item": [
@@ -65,22 +49,14 @@
       "request": {
         "method": "GET",
         "header": [],
-        "url": {
-          "raw": "{{base_url}}/",
-          "host": [
-            "{{base_url}}"
-          ],
-          "path": [
-            ""
-          ]
-        }
+        "url": "{{base_url}}/"
       }
     },
     {
-      "name": "Meta",
+      "name": "Pipeline",
       "item": [
         {
-          "name": "Create Meta",
+          "name": "Create Pipeline",
           "event": [
             {
               "listen": "test",
@@ -88,10 +64,10 @@
                 "type": "text/javascript",
                 "exec": [
                   "const data = pm.response.json();",
-                  "if (data.id) {",
-                  "  pm.collectionVariables.set('meta_id', data.id);",
-                  "  pm.collectionVariables.set('result_id', data.id);",
-                  "}"
+                  "if (data.trace_id) pm.collectionVariables.set('trace_id', data.trace_id);",
+                  "if (data.alert_id) pm.collectionVariables.set('alert_id', String(data.alert_id));",
+                  "if (data.prediction_id) pm.collectionVariables.set('prediction_id', String(data.prediction_id));",
+                  "if (data.investigation_id) pm.collectionVariables.set('investigation_id', String(data.investigation_id));"
                 ]
               }
             }
@@ -106,137 +82,18 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"log_id\": \"LOG-001\",\n  \"result_type\": \"agentAI.Type\"\n}"
+              "raw": "{\n  \"alert\": {\n    \"external_alert_id\": \"{{external_alert_id}}\",\n    \"alert_name\": \"UAC Bypass via Sdclt.exe on host test-host01.local\",\n    \"source\": \"Mock SIEM\",\n    \"severity\": \"High\",\n    \"detected_time\": \"2026-04-01T12:00:00\",\n    \"status\": \"RECEIVED\",\n    \"raw_log\": {\n      \"alert_status\": \"Closed\",\n      \"case_result\": \"FalsePositives\",\n      \"contexts\": {\n        \"os\": \"windows 11 22621\",\n        \"user\": \"test-host01$\",\n        \"src_ip\": [\n          \"10.0.1.15\"\n        ]\n      },\n      \"events\": [\n        {\n          \"event_id\": \"evt001\",\n          \"description\": \"Sdclt.exe executed\"\n        }\n      ]\n    }\n  },\n  \"type\": {\n    \"main_tactic\": \"T1059\",\n    \"main_technique\": \"Command and Scripting Interpreter\",\n    \"confidence\": 0.97,\n    \"mitre_matches\": [\n      {\n        \"tacticID\": \"T1059\",\n        \"confidence\": 1\n      }\n    ],\n    \"prediction\": {\n      \"tactic\": [\n        \"Execution\"\n      ],\n      \"technique\": [\n        \"Command and Scripting Interpreter\"\n      ]\n    },\n    \"source\": \"Existing_MITRE\",\n    \"status\": \"PENDING\"\n  },\n  \"context\": {\n    \"src_ip\": \"10.0.1.15\",\n    \"host\": \"test-host01.local\",\n    \"user_name\": \"test-host01$\",\n    \"context_data\": {\n      \"os\": \"windows 11 22621\"\n    },\n    \"status\": \"PENDING\"\n  },\n  \"investigation\": {\n    \"verdict\": \"Malicious\",\n    \"severity\": \"High\",\n    \"confidence\": \"High\",\n    \"summary\": \"Potential UAC bypass behavior detected.\",\n    \"investigation_data\": {\n      \"logClassification\": {\n        \"type\": \"UAC Bypass\"\n      }\n    },\n    \"status\": \"PROCESSING\",\n    \"prompt_send\": \"Analyze the alert, correlate the context, and explain whether containment is needed.\",\n    \"recommendations\": [\n      {\n        \"type\": \"soc\",\n        \"content\": \"Validate execution chain and isolate the endpoint if confirmed malicious.\",\n        \"status\": \"PENDING\"\n      },\n      {\n        \"type\": \"customer\",\n        \"content\": \"Please verify unusual behavior on this endpoint and report if expected.\",\n        \"status\": \"PENDING\"\n      }\n    ]\n  }\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/meta/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meta",
-                ""
-              ]
-            }
-          }
-        },
-        {
-          "name": "List Meta",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/meta/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meta",
-                ""
-              ]
-            }
-          }
-        },
-        {
-          "name": "Search Meta",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/meta/?log_id={{log_id}}&result_type=agentAI.Type",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meta",
-                ""
-              ],
-              "query": [
-                {
-                  "key": "log_id",
-                  "value": "{{log_id}}"
-                },
-                {
-                  "key": "result_type",
-                  "value": "agentAI.Type"
-                }
-              ]
-            }
-          }
-        },
-        {
-          "name": "Get Meta By ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/meta/{{meta_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meta",
-                "{{meta_id}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Update Meta",
-          "request": {
-            "method": "PUT",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"log_id\": \"LOG-001-UPDATED\",\n  \"result_type\": \"agentAI.Investigate\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/api/meta/{{meta_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meta",
-                "{{meta_id}}"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Delete Meta",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/meta/{{meta_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "meta",
-                "{{meta_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/pipeline/"
           }
         }
       ]
     },
     {
-      "name": "Alert Log Results",
+      "name": "Alerts",
       "item": [
         {
-          "name": "Create Log Result",
+          "name": "Create Alert",
           "event": [
             {
               "listen": "test",
@@ -244,9 +101,8 @@
                 "type": "text/javascript",
                 "exec": [
                   "const data = pm.response.json();",
-                  "if (data.id) {",
-                  "  pm.collectionVariables.set('result_id', data.id);",
-                  "}"
+                  "if (data.id) pm.collectionVariables.set('alert_id', String(data.id));",
+                  "if (data.trace_id) pm.collectionVariables.set('trace_id', data.trace_id);"
                 ]
               }
             }
@@ -261,95 +117,37 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"id\": \"{{result_id}}\",\n  \"process_time\": \"{{process_time}}\",\n  \"severity\": \"High\",\n  \"context_data\": {\n    \"src_ip\": \"10.0.0.1\",\n    \"event\": \"suspicious login\"\n  }\n}"
+              "raw": "{\n  \"external_alert_id\": \"{{external_alert_id}}\",\n  \"alert_name\": \"Suspicious PowerShell activity\",\n  \"source\": \"SIEM\",\n  \"severity\": \"High\",\n  \"detected_time\": \"2026-04-01T12:30:00\",\n  \"status\": \"RECEIVED\",\n  \"raw_log\": {\n    \"event\": \"powershell encoded command\",\n    \"src_ip\": \"10.0.1.15\"\n  }\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/log-results/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "log-results",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/alerts/"
           }
         },
         {
-          "name": "List Log Results",
+          "name": "List Alerts",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/log-results/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "log-results",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/alerts/?skip=0&limit=50"
           }
         },
         {
-          "name": "Search Log Results",
+          "name": "Search Alerts",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/log-results/?result_id={{result_id}}&severity=High&process_time_from={{process_time_from}}&process_time_to={{process_time_to}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "log-results",
-                ""
-              ],
-              "query": [
-                {
-                  "key": "result_id",
-                  "value": "{{result_id}}"
-                },
-                {
-                  "key": "severity",
-                  "value": "High"
-                },
-                {
-                  "key": "process_time_from",
-                  "value": "{{process_time_from}}"
-                },
-                {
-                  "key": "process_time_to",
-                  "value": "{{process_time_to}}"
-                }
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/alerts/?external_alert_id={{external_alert_id}}&severity=High&source=SIEM&status=RECEIVED"
           }
         },
         {
-          "name": "Get Log Result",
+          "name": "Get Alert By ID",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/log-results/{{result_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "log-results",
-                "{{result_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/alerts/{{alert_id}}"
           }
         },
         {
-          "name": "Update Log Result",
+          "name": "Update Alert",
           "request": {
             "method": "PUT",
             "header": [
@@ -360,43 +158,23 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"severity\": \"Critical\",\n  \"context_data\": {\n    \"src_ip\": \"10.0.0.1\",\n    \"event\": \"confirmed attack\"\n  }\n}"
+              "raw": "{\n  \"severity\": \"Critical\",\n  \"alert_name\": \"Suspicious PowerShell activity (confirmed)\",\n  \"status\": \"PROCESSING\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/log-results/{{result_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "log-results",
-                "{{result_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/alerts/{{alert_id}}"
           }
         },
         {
-          "name": "Delete Log Result",
+          "name": "Delete Alert",
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/log-results/{{result_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "log-results",
-                "{{result_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/alerts/{{alert_id}}"
           }
         }
       ]
     },
     {
-      "name": "Result Type Prediction",
+      "name": "Predictions",
       "item": [
         {
           "name": "Create Prediction",
@@ -407,9 +185,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "const data = pm.response.json();",
-                  "if (data.id) {",
-                  "  pm.collectionVariables.set('prediction_id', data.id);",
-                  "}"
+                  "if (data.id) pm.collectionVariables.set('prediction_id', String(data.id));"
                 ]
               }
             }
@@ -424,19 +200,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"result_id\": \"{{result_id}}\",\n  \"log_id\": \"LOG-001\",\n  \"confidence_overall\": 0.9234,\n  \"mitre_matches\": {\n    \"techniques\": [\"T1059\", \"T1113\"]\n  }\n}"
+              "raw": "{\n  \"trace_id\": \"{{trace_id}}\",\n  \"alert_id\": {{alert_id}},\n  \"main_tactic\": \"T1059\",\n  \"main_technique\": \"Command and Scripting Interpreter\",\n  \"confidence\": 0.9321,\n  \"mitre_matches\": {\n    \"techniques\": [\"T1059\", \"T1086\"]\n  },\n  \"prediction\": {\n    \"tactic\": [\"Execution\"],\n    \"technique\": [\"PowerShell\"]\n  },\n  \"source\": \"Existing_MITRE\",\n  \"status\": \"PENDING\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/predictions/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "predictions",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/predictions/"
           }
         },
         {
@@ -444,17 +210,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/predictions/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "predictions",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/predictions/?skip=0&limit=50"
           }
         },
         {
@@ -462,49 +218,15 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/predictions/?prediction_id={{prediction_id}}&result_id={{result_id}}&log_id={{log_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "predictions",
-                ""
-              ],
-              "query": [
-                {
-                  "key": "prediction_id",
-                  "value": "{{prediction_id}}"
-                },
-                {
-                  "key": "result_id",
-                  "value": "{{result_id}}"
-                },
-                {
-                  "key": "log_id",
-                  "value": "{{log_id}}"
-                }
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/predictions/?alert_id={{alert_id}}&trace_id={{trace_id}}&status=PENDING"
           }
         },
         {
-          "name": "Get Prediction",
+          "name": "Get Prediction By ID",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/predictions/{{prediction_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "predictions",
-                "{{prediction_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/predictions/{{prediction_id}}"
           }
         },
         {
@@ -519,19 +241,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"confidence_overall\": 0.9750,\n  \"mitre_matches\": {\n    \"techniques\": [\"T1059\", \"T1204\"]\n  }\n}"
+              "raw": "{\n  \"confidence\": 0.98,\n  \"main_technique\": \"PowerShell\",\n  \"status\": \"DONE\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/predictions/{{prediction_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "predictions",
-                "{{prediction_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/predictions/{{prediction_id}}"
           }
         },
         {
@@ -539,26 +251,16 @@
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/predictions/{{prediction_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "predictions",
-                "{{prediction_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/predictions/{{prediction_id}}"
           }
         }
       ]
     },
     {
-      "name": "Result Investigation",
+      "name": "Contexts",
       "item": [
         {
-          "name": "Create Investigation",
+          "name": "Create Context",
           "event": [
             {
               "listen": "test",
@@ -566,9 +268,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "const data = pm.response.json();",
-                  "if (data.id) {",
-                  "  pm.collectionVariables.set('investigation_id', data.id);",
-                  "}"
+                  "if (data.id) pm.collectionVariables.set('context_id', String(data.id));"
                 ]
               }
             }
@@ -583,19 +283,92 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"result_id\": \"{{result_id}}\",\n  \"log_id\": \"LOG-001\",\n  \"verdict_flag\": \"Suspicious\",\n  \"conclusion\": \"Need deeper manual review\"\n}"
+              "raw": "{\n  \"trace_id\": \"{{trace_id}}\",\n  \"alert_id\": {{alert_id}},\n  \"src_ip\": \"10.0.1.15\",\n  \"host\": \"test-host01.local\",\n  \"user_name\": \"test-host01$\",\n  \"context_data\": {\n    \"os\": \"windows 11 22621\"\n  },\n  \"status\": \"PENDING\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/investigations/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "investigations",
-                ""
-              ]
+            "url": "{{base_url}}{{api_prefix}}/contexts/"
+          }
+        },
+        {
+          "name": "List Contexts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/contexts/?skip=0&limit=50"
+          }
+        },
+        {
+          "name": "Search Contexts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/contexts/?alert_id={{alert_id}}&trace_id={{trace_id}}&status=PENDING"
+          }
+        },
+        {
+          "name": "Get Context By ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/contexts/{{context_id}}"
+          }
+        },
+        {
+          "name": "Update Context",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"host\": \"test-host01-updated.local\",\n  \"status\": \"DONE\"\n}"
+            },
+            "url": "{{base_url}}{{api_prefix}}/contexts/{{context_id}}"
+          }
+        },
+        {
+          "name": "Delete Context",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": "{{base_url}}{{api_prefix}}/contexts/{{context_id}}"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Investigations",
+      "item": [
+        {
+          "name": "Create Investigation",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.id) pm.collectionVariables.set('investigation_id', String(data.id));"
+                ]
+              }
             }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"trace_id\": \"{{trace_id}}\",\n  \"alert_id\": {{alert_id}},\n  \"prediction_id\": {{prediction_id}},\n  \"verdict\": \"Malicious\",\n  \"severity\": \"High\",\n  \"confidence\": \"High\",\n  \"summary\": \"Behavior aligns with suspicious command execution.\",\n  \"investigation_data\": {\n    \"overallVerdict\": {\n      \"rationale\": \"Correlated events indicate malicious behavior\"\n    }\n  },\n  \"status\": \"PROCESSING\",\n  \"prompt_send\": \"Correlate alert telemetry with prediction output and produce an investigation summary.\"\n}"
+            },
+            "url": "{{base_url}}{{api_prefix}}/investigations/"
           }
         },
         {
@@ -603,17 +376,7 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/investigations/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "investigations",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/investigations/?skip=0&limit=50"
           }
         },
         {
@@ -621,53 +384,15 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/investigations/?investigation_id={{investigation_id}}&result_id={{result_id}}&log_id={{log_id}}&verdict_flag=Suspicious",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "investigations",
-                ""
-              ],
-              "query": [
-                {
-                  "key": "investigation_id",
-                  "value": "{{investigation_id}}"
-                },
-                {
-                  "key": "result_id",
-                  "value": "{{result_id}}"
-                },
-                {
-                  "key": "log_id",
-                  "value": "{{log_id}}"
-                },
-                {
-                  "key": "verdict_flag",
-                  "value": "Suspicious"
-                }
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/investigations/?alert_id={{alert_id}}&prediction_id={{prediction_id}}&trace_id={{trace_id}}&verdict=Malicious&status=PROCESSING"
           }
         },
         {
-          "name": "Get Investigation",
+          "name": "Get Investigation By ID",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/investigations/{{investigation_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "investigations",
-                "{{investigation_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/investigations/{{investigation_id}}"
           }
         },
         {
@@ -682,19 +407,9 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"verdict_flag\": \"Malicious\",\n  \"conclusion\": \"Malware behavior confirmed\"\n}"
+              "raw": "{\n  \"summary\": \"Escalated for SOC action\",\n  \"severity\": \"Critical\",\n  \"status\": \"DONE\",\n  \"prompt_send\": \"Summarize the final conclusion and recommended actions for SOC handoff.\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/investigations/{{investigation_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "investigations",
-                "{{investigation_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/investigations/{{investigation_id}}"
           }
         },
         {
@@ -702,26 +417,16 @@
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/investigations/{{investigation_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "investigations",
-                "{{investigation_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/investigations/{{investigation_id}}"
           }
         }
       ]
     },
     {
-      "name": "Agent Queue",
+      "name": "Recommendations",
       "item": [
         {
-          "name": "Create Agent Queue",
+          "name": "Create Recommendation",
           "event": [
             {
               "listen": "test",
@@ -729,9 +434,7 @@
                 "type": "text/javascript",
                 "exec": [
                   "const data = pm.response.json();",
-                  "if (data.id) {",
-                  "  pm.collectionVariables.set('queue_id', data.id);",
-                  "}"
+                  "if (data.id) pm.collectionVariables.set('recommendation_id', String(data.id));"
                 ]
               }
             }
@@ -746,103 +449,37 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"log_id\": \"LOG-001\",\n  \"subject\": \"agentAI.Context\",\n  \"payload\": {\n    \"alert_name\": \"UAC Bypass\",\n    \"severity\": \"High\"\n  },\n  \"status\": \"pending\",\n  \"sent_at\": \"{{sent_at}}\"\n}"
+              "raw": "{\n  \"trace_id\": \"{{trace_id}}\",\n  \"investigation_id\": {{investigation_id}},\n  \"type\": \"soc\",\n  \"content\": \"Validate process chain, isolate endpoint, and collect forensic artifacts.\",\n  \"status\": \"PENDING\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/agent-queue/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "agent-queue",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/recommendations/"
           }
         },
         {
-          "name": "List Agent Queue",
+          "name": "List Recommendations",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/agent-queue/",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "agent-queue",
-                ""
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/recommendations/?skip=0&limit=50"
           }
         },
         {
-          "name": "Search Agent Queue",
+          "name": "Search Recommendations",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/agent-queue/?queue_id={{queue_id}}&log_id={{log_id}}&subject=agentAI.Context&status=pending&sent_at_from={{sent_at_from}}&sent_at_to={{sent_at_to}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "agent-queue",
-                ""
-              ],
-              "query": [
-                {
-                  "key": "queue_id",
-                  "value": "{{queue_id}}"
-                },
-                {
-                  "key": "log_id",
-                  "value": "{{log_id}}"
-                },
-                {
-                  "key": "subject",
-                  "value": "agentAI.Context"
-                },
-                {
-                  "key": "status",
-                  "value": "pending"
-                },
-                {
-                  "key": "sent_at_from",
-                  "value": "{{sent_at_from}}"
-                },
-                {
-                  "key": "sent_at_to",
-                  "value": "{{sent_at_to}}"
-                }
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/recommendations/?trace_id={{trace_id}}&investigation_id={{investigation_id}}&recommendation_type=soc&status=PENDING"
           }
         },
         {
-          "name": "Get Agent Queue",
+          "name": "Get Recommendation By ID",
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/agent-queue/{{queue_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "agent-queue",
-                "{{queue_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/recommendations/{{recommendation_id}}"
           }
         },
         {
-          "name": "Update Agent Queue By UUID",
+          "name": "Update Recommendation",
           "request": {
             "method": "PUT",
             "header": [
@@ -853,37 +490,17 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"status\": \"processing\",\n  \"log_id\": \"LOG-001-UPDATED\",\n  \"payload\": {\n    \"alert_name\": \"UAC Bypass\",\n    \"severity\": \"Critical\"\n  }\n}"
+              "raw": "{\n  \"content\": \"Escalate incident and perform endpoint containment immediately.\",\n  \"status\": \"DONE\"\n}"
             },
-            "url": {
-              "raw": "{{base_url}}/api/agent-queue/{{queue_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "agent-queue",
-                "{{queue_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/recommendations/{{recommendation_id}}"
           }
         },
         {
-          "name": "Delete Agent Queue",
+          "name": "Delete Recommendation",
           "request": {
             "method": "DELETE",
             "header": [],
-            "url": {
-              "raw": "{{base_url}}/api/agent-queue/{{queue_id}}",
-              "host": [
-                "{{base_url}}"
-              ],
-              "path": [
-                "api",
-                "agent-queue",
-                "{{queue_id}}"
-              ]
-            }
+            "url": "{{base_url}}{{api_prefix}}/recommendations/{{recommendation_id}}"
           }
         }
       ]

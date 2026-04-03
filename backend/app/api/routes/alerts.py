@@ -1,133 +1,96 @@
-from fastapi import APIRouter, Query, HTTPException
-from typing import List, Optional
-from pydantic import BaseModel
 from datetime import datetime
-import uuid, random
+from typing import Optional
+
+from fastapi import APIRouter, HTTPException, Query
+from pydantic import BaseModel
+
+from app.services.paiac_store import PaiacAPIError, get_paiac_store
 
 router = APIRouter()
 
-# --- Schemas ---
-class Alert(BaseModel):
-    id: str
-    title: str
-    severity: str          # critical | high | medium | low
-    status: str            # open | triaged | closed | escalated
-    source: str
-    src_ip: Optional[str] = None
-    dst_ip: Optional[str] = None
-    mitre_tactic: Optional[str] = None
-    created_at: datetime
-    updated_at: datetime
 
 class TriageRequest(BaseModel):
-    decision: str          # true_positive | false_positive | escalate
+    decision: str
     assignee: Optional[str] = None
     notes: Optional[str] = None
 
-# --- Mock Data ---
-MOCK_ALERTS = [
-    Alert(id=str(uuid.uuid4()), title="Brute Force Login Detected", severity="high",
-          status="open", source="SIEM", src_ip="192.168.1.105", dst_ip="10.0.0.1",
-          mitre_tactic="TA0006 - Credential Access",
-          created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    Alert(id=str(uuid.uuid4()), title="Lateral Movement via SMB", severity="critical",
-          status="open", source="EDR", src_ip="10.0.1.22", dst_ip="10.0.1.50",
-          mitre_tactic="TA0008 - Lateral Movement",
-          created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    Alert(id=str(uuid.uuid4()), title="Suspicious PowerShell Execution", severity="high",
-          status="triaged", source="EDR", src_ip="10.0.2.15",
-          mitre_tactic="TA0002 - Execution",
-          created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    Alert(id=str(uuid.uuid4()), title="DNS Tunneling Detected", severity="medium",
-          status="open", source="NDR", src_ip="172.16.0.110",
-          mitre_tactic="TA0011 - Command and Control",
-          created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="EDR", src_ip="10.0.3.42",
-    #       mitre_tactic="TA0040 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="SIEM", src_ip="12.22.2231",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="SIEM", src_ip="12.22.431",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="SIEM", src_ip="12.22.111",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="SIEM", src_ip="12.22.131",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="SIEM", src_ip="12.22.531",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="critical",
-    #       status="escalated", source="SIEM", src_ip="12.22.1321",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="Low",
-    #       status="escalated", source="SIEM", src_ip="12.22.12",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="Low",
-    #       status="escalated", source="SIEM", src_ip="142.22.131",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="Low",
-    #       status="escalated", source="SIEM", src_ip="12.252.131",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-    # Alert(id=str(uuid.uuid4()), title="Ransomware File Encryption Activity", severity="Low",
-    #       status="escalated", source="SIEM", src_ip="112.252.131",
-    #       mitre_tactic="TA0020 - Impact",
-    #       created_at=datetime.utcnow(), updated_at=datetime.utcnow()),
-]
 
-# --- Routes ---
-@router.get("/", response_model=List[Alert])
+def _to_int_id(value: str, resource: str) -> int:
+    try:
+        return int(value)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=f"Invalid {resource} id: {value}") from exc
+
+
+@router.get("/")
 async def list_alerts(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=200),
+    external_alert_id: Optional[str] = Query(None),
     severity: Optional[str] = Query(None),
+    source: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
-    limit: int = Query(50, le=200),
-    offset: int = Query(0),
 ):
-    alerts = MOCK_ALERTS
-    if severity:
-        alerts = [a for a in alerts if a.severity == severity]
-    if status:
-        alerts = [a for a in alerts if a.status == status]
-    return alerts[offset : offset + limit]
+    store = get_paiac_store()
+    try:
+        return await store.list_alerts(
+            skip=skip,
+            limit=limit,
+            external_alert_id=external_alert_id,
+            severity=severity,
+            source=source,
+            status=status,
+        )
+    except PaiacAPIError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+
 
 @router.get("/stats")
 async def alert_stats():
-    return {
-        "total": len(MOCK_ALERTS),
-        "critical": sum(1 for a in MOCK_ALERTS if a.severity == "critical"),
-        "high": sum(1 for a in MOCK_ALERTS if a.severity == "high"),
-        "medium": sum(1 for a in MOCK_ALERTS if a.severity == "medium"),
-        "open": sum(1 for a in MOCK_ALERTS if a.status == "open"),
-        "escalated": sum(1 for a in MOCK_ALERTS if a.status == "escalated"),
-    }
+    try:
+        return await get_paiac_store().alert_stats()
+    except PaiacAPIError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
 
-@router.get("/{alert_id}", response_model=Alert)
+
+@router.get("/{alert_id}")
 async def get_alert(alert_id: str):
-    for alert in MOCK_ALERTS:
-        if alert.id == alert_id:
-            return alert
-    raise HTTPException(status_code=404, detail="Alert not found")
+    parsed_id = _to_int_id(alert_id, "alert")
+    try:
+        alert = await get_paiac_store().get_alert(parsed_id)
+    except PaiacAPIError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    if alert is None:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return alert
+
+
+@router.get("/{alert_id}/details")
+async def get_alert_details(alert_id: str):
+    parsed_id = _to_int_id(alert_id, "alert")
+    try:
+        bundle = await get_paiac_store().alert_bundle(parsed_id)
+    except PaiacAPIError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    if not bundle:
+        raise HTTPException(status_code=404, detail="Alert not found")
+    return bundle
+
 
 @router.post("/{alert_id}/triage")
 async def triage_alert(alert_id: str, body: TriageRequest):
+    parsed_id = _to_int_id(alert_id, "alert")
+    try:
+        alert = await get_paiac_store().get_alert(parsed_id)
+    except PaiacAPIError as exc:
+        raise HTTPException(status_code=exc.status_code, detail=exc.detail) from exc
+    if alert is None:
+        raise HTTPException(status_code=404, detail="Alert not found")
     return {
-        "alert_id": alert_id,
+        "alert_id": parsed_id,
         "decision": body.decision,
         "assignee": body.assignee,
         "notes": body.notes,
-        "triaged_at": datetime.utcnow(),
+        "triaged_at": datetime.utcnow().isoformat(),
         "message": f"Alert triaged as {body.decision}",
     }
