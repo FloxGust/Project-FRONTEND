@@ -73,7 +73,7 @@ export default function Layout() {
         <div style={{ padding: 12, borderTop: '1px solid #1f2937', fontSize: 10, color: '#374151' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 4, marginTop: 4 }}>
             <Activity size={12} style={{ marginRight: 4 }} />
-            API: http://127.0.0.1:8000
+            API: /api (backend :8181)
           </div>
         </div>
       </aside>

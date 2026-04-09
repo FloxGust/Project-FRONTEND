@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     SECRET_KEY: str = "change-me"
 
     HOST: str = "0.0.0.0"
-    PORT: int = 8000
+    PORT: int = 8181
 
     CORS_ORIGINS: List[str] = ["http://localhost:3000", "http://localhost:5173"]
 

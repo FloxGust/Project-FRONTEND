@@ -9,9 +9,9 @@ Agentic Security Operations Center — Frontend (React) + Backend (FastAPI)
 docker-compose up --build
 ```
 - Frontend: http://localhost:3000
-- Backend API: http://localhost:8000
+- Backend API: http://localhost:8181
 - Nginx (unified): http://localhost:80
-- API Docs: http://localhost:8000/docs
+- API Docs: http://localhost:8181/docs
 
 ### Local Development
 
@@ -20,7 +20,7 @@ docker-compose up --build
 cd backend
 pip install -r requirements.txt
 cp .env .env.local  # edit as needed
-uvicorn app.main:app --reload
+uvicorn app.main:app --reload --port 8181
 ```
 
 **Frontend:**
