@@ -2,7 +2,9 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/layout/Layout'
 import Dashboard from './pages/Dashboard/Dashboard'
 import AlertQueue from './pages/AlertQueue/AlertQueue'
-import Investigate from './pages/Investigate/Investigate'
+import InvestigateDetail from './pages/Investigate/investigate-detail'
+import InvestigateContext from './pages/Investigate/investigate-context'
+import InvestigateSummary from './pages/Investigate/investigate-summary'
 import AgentOrchestrator from './pages/AgentOrchestrator/AgentOrchestrator'
 import Incidents from './pages/Incidents/Incidents'
 import Home from './pages/Home/Home'
@@ -17,7 +19,12 @@ export default function App() {
           <Route path="home" element={<Home />} />
           <Route path="dashboard"   element={<Dashboard />} />
           <Route path="alerts"      element={<AlertQueue />} />
-          <Route path="investigate/:alertId?" element={<Investigate />} />
+          <Route path="investigate" element={<InvestigateDetail />} />
+          <Route path="investigate/context" element={<InvestigateContext />} />
+          <Route path="investigate/summary" element={<InvestigateSummary />} />
+          <Route path="investigate/:alertId" element={<InvestigateDetail />} />
+          <Route path="investigate/:alertId/context" element={<InvestigateContext />} />
+          <Route path="investigate/:alertId/summary" element={<InvestigateSummary />} />
           <Route path="agents"      element={<AgentOrchestrator />} />
           <Route path="incidents"   element={<Incidents />} />
           <Route path="about-us"    element={<AboutUs />} />
