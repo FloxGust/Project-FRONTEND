@@ -22,12 +22,18 @@ class Settings(BaseSettings):
     AGENT_MAX_CONCURRENT: int = 5
     AGENT_TIMEOUT_SECONDS: int = 300
 
-    PAIAC_BASE_URL: str = "https://db.paiac.store"
+    PUBLIC_DOMAIN: bool = True
+    PAIAC_PUBLIC_BASE_URL: str = "https://db.paiac.store"
+    PAIAC_LOCAL_BASE_URL: str = "http://host.docker.internal:8000"
     PAIAC_API_PREFIX: str = ""
     PAIAC_TIMEOUT_SECONDS: int = 20
 
     VIRUSTOTAL_API_KEY: str = ""
     SHODAN_API_KEY: str = ""
+
+    @property
+    def PAIAC_BASE_URL(self) -> str:
+        return self.PAIAC_PUBLIC_BASE_URL if self.PUBLIC_DOMAIN else self.PAIAC_LOCAL_BASE_URL
 
     class Config:
         env_file = ".env"

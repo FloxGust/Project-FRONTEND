@@ -12,6 +12,8 @@ services:
       - ./backend/.env
     volumes:
       - ./backend:/app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - soc_net
     restart: unless-stopped
@@ -28,6 +30,8 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - soc_net
     restart: unless-stopped

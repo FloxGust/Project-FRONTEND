@@ -7,6 +7,13 @@ export default defineConfig(({ mode }) => {
   const hmrPort = Number(env.VITE_HMR_PORT || 5173)
   const hmrClientPort = Number(env.VITE_HMR_CLIENT_PORT || hmrPort)
   const hmrProtocol = env.VITE_HMR_PROTOCOL || 'ws'
+  const usePublicDomain = String(env.VITE_PUBLIC_DOMAIN || 'true').toLowerCase() === 'true'
+  const dbProxyTarget = usePublicDomain
+    ? env.VITE_DB_PUBLIC_PROXY_TARGET || 'https://db.paiac.store'
+    : env.VITE_DB_LOCAL_PROXY_TARGET || 'http://host.docker.internal:8000'
+  const dbProxySecure = usePublicDomain
+    ? String(env.VITE_DB_PUBLIC_PROXY_SECURE || 'true').toLowerCase() === 'true'
+    : String(env.VITE_DB_LOCAL_PROXY_SECURE || 'false').toLowerCase() === 'true'
 
   return {
     plugins: [react()],
@@ -31,10 +38,11 @@ export default defineConfig(({ mode }) => {
           target: 'http://backend:8181',
           changeOrigin: true,
         },
-        '/agent-queue-proxy': {
-          target: 'http://192.168.1.9:8000',
+        '/db-proxy': {
+          target: dbProxyTarget,
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/agent-queue-proxy/, ''),
+          secure: dbProxySecure,
+          rewrite: (path) => path.replace(/^\/db-proxy/, ''),
         },
         '/ws': {
           target: 'ws://backend:8181',
