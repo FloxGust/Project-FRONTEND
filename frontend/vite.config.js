@@ -14,6 +14,7 @@ export default defineConfig(({ mode }) => {
   const dbProxySecure = usePublicDomain
     ? String(env.VITE_DB_PUBLIC_PROXY_SECURE || 'true').toLowerCase() === 'true'
     : String(env.VITE_DB_LOCAL_PROXY_SECURE || 'false').toLowerCase() === 'true'
+  const sedrProxyTarget = env.VITE_SEDR_PROXY_TARGET || 'http://host.docker.internal:9003'
 
   return {
     plugins: [react()],
@@ -43,6 +44,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: dbProxySecure,
           rewrite: (path) => path.replace(/^\/db-proxy/, ''),
+        },
+        '/sedr-publish': {
+          target: sedrProxyTarget,
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/sedr-publish/, ''),
         },
         '/ws': {
           target: 'ws://backend:8181',

@@ -1,6 +1,6 @@
 import { Outlet, NavLink, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import { Activity, Bell, Bot, FileWarning, Home, LayoutDashboard, Search } from 'lucide-react'
+import { Activity, Bell, Bot, FileWarning, Home, LayoutDashboard, Radio, Search } from 'lucide-react'
 
 const NAV = [
   { to: '/home', icon: Home, label: 'Home' },
@@ -9,6 +9,7 @@ const NAV = [
   { to: '/investigate', icon: Search, label: 'Investigate' },
   { to: '/agents', icon: Bot, label: 'Agents' },
   { to: '/incidents', icon: FileWarning, label: 'Incidents'},
+  { to: '/sedr', icon: Radio, label: 'Send EDR' },
   { to: '/about-us', icon: FileWarning, label: 'About Us' },
 ]
 

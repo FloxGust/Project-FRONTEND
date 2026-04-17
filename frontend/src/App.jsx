@@ -9,6 +9,7 @@ import AgentOrchestrator from './pages/AgentOrchestrator/AgentOrchestrator'
 import Incidents from './pages/Incidents/Incidents'
 import Home from './pages/Home/Home'
 import AboutUs from './pages/AboutUs/AboutUs'
+import SendEdr from './pages/SEDR/sendedr'
 
 export default function App() {
   return (
@@ -27,6 +28,7 @@ export default function App() {
           <Route path="investigate/:alertId/summary" element={<InvestigateSummary />} />
           <Route path="agents"      element={<AgentOrchestrator />} />
           <Route path="incidents"   element={<Incidents />} />
+          <Route path="sedr"        element={<SendEdr />} />
           <Route path="about-us"    element={<AboutUs />} />
         </Route>
       </Routes>
