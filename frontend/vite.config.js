@@ -23,8 +23,8 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       watch: {
         usePolling: true,
-        interval: 50,
-        binaryInterval: 100,
+        interval: 10,
+        binaryInterval: 600000,
       },
       hmr: hmrHost
         ? {
