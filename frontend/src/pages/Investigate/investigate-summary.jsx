@@ -288,13 +288,13 @@ export default function InvestigateSummary() {
         </div>
       )}
 
-      <section style={{ display: 'grid', gridTemplateColumns: '188px minmax(0, 1fr) 194px', gap: 10, alignItems: 'start' }}>
-        <aside style={{ ...panelStyle, minHeight: 506, padding: 14 }}>
+      <section style={{ display: 'grid', gridTemplateColumns: '250px 1fr 250px', gap:16, alignItems: 'start' }}>
+        <aside style={{ ...panelStyle, minHeight: 506, padding: 14, minWidth: 250}}>
           <h2 style={{ margin: '8px 0 16px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
             KEY ENTITIES
           </h2>
 
-          <div style={{ display: 'grid', gap: 7 }}>
+          <div style={{ display: 'grid', gap: 16 }}>
             <EntityRow icon={Monitor} label="ID" value={pickFirst(alert?.id, target)} />
             <EntityRow label="Domain name" value={pickFirst(alert?.domain_name, alert?.external_alert_id)} />
             <EntityRow label="IP" value={pickFirst(latestContext.src_ip, alert?.src_ip, alert?.source_ip, alert?.ip)} />
@@ -320,6 +320,10 @@ export default function InvestigateSummary() {
 
           <div style={{ display: 'grid', gap: 7, marginTop: 16, color: '#dce2f0', fontSize: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+              <span>Detected</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.detected_time || latestContext.created_at)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
               <span>Create at</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.created_at || latestContext.created_at)}</span>
             </div>
@@ -327,14 +331,10 @@ export default function InvestigateSummary() {
               <span>Update at</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.updated_at || latestContext.updated_at)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-              <span>Latency</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{pickFirst(latestContext.latency, latestContext.latency_seconds)}</span>
-            </div>
           </div>
         </aside>
 
-        <main style={{ display: 'grid', gap: 16 }}>
+        <main style={{ display: 'grid', gap: 16, minWidth: 100}}>
           <section style={{ ...panelStyle, minHeight: 246, padding: 26 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
               <Sparkles size={15} color="#48c7ff" />
@@ -344,10 +344,10 @@ export default function InvestigateSummary() {
               {analysisSummary}
             </p>
             <div style={{ display: 'flex', alignItems: 'end', gap: 26 }}>
-              <div>
+              {/* <div>
                 <div style={{ color: '#99a3b8', fontSize: 10, marginBottom: 6 }}>Verdict</div>
                 <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
-              </div>
+              </div> */}
               <div>
                 <div style={{ color: '#99a3b8', fontSize: 10, marginBottom: 6 }}>Confidence</div>
                 <div style={{ color: '#ff4058', fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900 }}>

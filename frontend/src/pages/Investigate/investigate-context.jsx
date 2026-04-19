@@ -254,8 +254,8 @@ export default function InvestigateContext() {
         </div>
       )}
 
-      <section style={{ display: 'grid', gridTemplateColumns: '188px minmax(0, 1fr)', gap: 10, alignItems: 'start' }}>
-        <aside style={{ ...panelStyle, minHeight: 506, padding: 14 }}>
+      <section style={{ display: 'grid', gridTemplateColumns: '188px minmax(0, 1fr)', gap: 70, alignItems: 'start' }}>
+        <aside style={{ ...panelStyle, minHeight: 506, padding: 14, minWidth: 250}}>
           <h2 style={{ margin: '8px 0 16px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
             KEY ENTITIES
           </h2>
@@ -286,6 +286,10 @@ export default function InvestigateContext() {
 
           <div style={{ display: 'grid', gap: 7, marginTop: 16, color: '#dce2f0', fontSize: 12 }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+              <span>Detected</span>
+              <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.detected_time || latestContext.created_at)}</span>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
               <span>Create at</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.created_at || latestContext.created_at)}</span>
             </div>
@@ -293,10 +297,10 @@ export default function InvestigateContext() {
               <span>Update at</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.updated_at || latestContext.updated_at)}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+            {/* <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
               <span>Latency</span>
               <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{pickFirst(latestContext.latency, latestContext.latency_seconds)}</span>
-            </div>
+            </div> */}
           </div>
         </aside>
 
@@ -315,7 +319,7 @@ export default function InvestigateContext() {
             }}
           >
             <TerminalSquare size={16} color="#dce5ff" />
-            <span style={{ color: '#f7f8fb', fontSize: 16, fontWeight: 800 }}>Raw Log</span>
+            <span style={{ color: '#f7f8fb', fontSize: 16, fontWeight: 800 }}>Context Log</span>
           </div>
 
           <section
@@ -328,22 +332,19 @@ export default function InvestigateContext() {
             }}
           >
             <div style={{ marginBottom: 34 }}>
-              <h3 style={{ margin: '0 0 18px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 15, letterSpacing: 2 }}>
+              {/* <h3 style={{ margin: '0 0 18px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 15, letterSpacing: 2 }}>
                 Type
-              </h3>
+              </h3> */}
               <pre style={{ margin: 0, color: '#d8deed', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
                 {toPretty(rawLog)}
               </pre>
             </div>
 
-            <div>
-              <h3 style={{ margin: '0 0 18px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 15, letterSpacing: 2 }}>
-                Context
-              </h3>
+            {/* <div>
               <pre style={{ margin: 0, color: '#d8deed', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.5, whiteSpace: 'pre-wrap' }}>
                 {toPretty(rawContext)}
               </pre>
-            </div>
+            </div> */}
           </section>
         </main>
       </section>

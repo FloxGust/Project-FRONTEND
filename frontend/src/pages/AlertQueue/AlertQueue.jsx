@@ -146,7 +146,7 @@ export default function AlertQueue() {
   const filterOptions = useMemo(() => {
     const options = new Set(['all'])
     for (const alert of alerts) {
-      if (alert.status) options.add(alert.status)
+      // if (alert.status) options.add(alert.status)
       if (alert.severity && alert.severity !== 'unknown') options.add(alert.severity)
       if (alert.source && alert.source !== '-') options.add(alert.source)
     }
@@ -158,7 +158,7 @@ export default function AlertQueue() {
     return alerts
       .filter((alert) => {
         if (filter === 'all') return true
-        return alert.status === filter || alert.severity === filter || alert.source === filter
+        return  alert.severity === filter || alert.source === filter //alert.status === filter ||
       })
       .filter((alert) => {
         if (!query) return true
@@ -270,7 +270,7 @@ export default function AlertQueue() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #1f2937' }}>
-              {['Status', 'Severity', 'ID', 'External ID', 'Alert Name', 'Source', 'Detected', 'Trace ID', 'Source IP', ''].map((header) => (
+              {['Severity', 'ID', 'External ID', 'Alert Name', 'Source', 'Detected', 'Trace ID', 'Source IP', ''].map((header) => (
                 <th
                   key={header}
                   style={{
@@ -320,9 +320,9 @@ export default function AlertQueue() {
                   }}
                   onClick={() => navigate(`/investigate/${alert.id}`)}
                 >
-                  <td style={{ padding: '12px 16px' }}>
+                  {/* <td style={{ padding: '12px 16px' }}>
                     <StatusBadge status={alert.status} />
-                  </td>
+                  </td> */}
                   <td style={{ padding: '12px 16px' }}>
                     <SeverityBadge severity={alert.severity} />
                   </td>

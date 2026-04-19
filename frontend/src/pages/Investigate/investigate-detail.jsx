@@ -19,10 +19,10 @@ import { useNavigate } from 'react-router-dom'
   
 
 const panelStyle = {
-  background: 'linear-gradient(180deg, rgba(12, 15, 31, 0.96), rgba(8, 10, 22, 0.96))',
+  background: 'linear-gradient(180deg, rgba(12, 15, 31, 1), rgba(8, 10, 22, 0.6))',
   border: '1px solid rgba(105, 115, 150, 0.42)',
   borderRadius: 14,
-  boxShadow: '0 18px 50px rgba(0, 0, 0, 0.28)',
+  boxShadow: '0 18px 50px rgba(0, 0, 0, 0.09)',
 }
 
 const toPretty = (value) => {
@@ -104,7 +104,7 @@ const Chip = ({ children, tone = 'blue' }) => {
 }
 
 const ProgressStep = ({ icon: Icon, title, subtitle, active }) => (
-  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, minWidth: 112 }}>
+  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, minWidth: 112 }}>
     <div
       style={{
         width: 30,
@@ -112,8 +112,8 @@ const ProgressStep = ({ icon: Icon, title, subtitle, active }) => (
         borderRadius: '50%',
         display: 'grid',
         placeItems: 'center',
-        border: `1px solid ${active ? '#dbe5ff' : 'rgba(155, 164, 190, 0.75)'}`,
-        background: active ? 'rgba(255, 255, 255, 0.14)' : 'rgba(8, 10, 22, 0.78)',
+        border: `1px solid ${active ? '#ffffff' : 'rgb(255, 255, 255)'}`,
+        background: active ? 'hsla(0, 0%, 100%, 0.51)' : 'rgba(8, 10, 22, 0.09)',
         color: active ? '#ffffff' : '#b5bfd4',
       }}
     >
@@ -162,11 +162,11 @@ export default function InvestigateDetail() {
   const alert = bundle?.alert || null
   const predictions = useMemo(() => bundle?.predictions || [], [bundle])
   const investigations = useMemo(() => bundle?.investigations || [], [bundle])
-  const latestPrediction = predictions[0] || {}
+  // const latestPrediction = predictions[0] || {}
   const latestInvestigation = investigations[0] || {}
   const badge = statusBadge(latestInvestigation.verdict || alert?.status)
 
-  const title = alert?.alert_name || latestInvestigation.summary || 'Untitled Alert'
+  const title = alert?.alert_name || latestInvestigation.summary || ''
   const source = alert?.source || latestInvestigation.source || '-'
   const severity = alert?.severity || latestInvestigation.severity || '-'
 
@@ -174,10 +174,10 @@ export default function InvestigateDetail() {
     <div
       style={{
         minHeight: 'calc(100vh - 40px)',
-        padding: '0 4px 4px',
+        padding: '20px 20px',
         color: '#f7f8fb',
         background:
-          'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.22), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 34%), #050814',
+          'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.2), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 74%), #05081441',
       }}
     >
       <InvestigateHeader />
@@ -221,7 +221,7 @@ export default function InvestigateDetail() {
               style={{
                 flex: 1,
                 minWidth: 0,
-                background: '#080b16',
+                background: '#080b1613',
                 border: '1px solid rgba(105, 115, 150, 0.42)',
                 borderRadius: 8,
                 padding: '11px 14px',
@@ -239,7 +239,7 @@ export default function InvestigateDetail() {
                 alignItems: 'center',
                 justifyContent: 'center',
                 gap: 8,
-                background: loading ? '#1f2937' : 'rgba(79, 111, 255, 0.15)',
+                background: loading ? '#1f2937' : 'rgba(79, 111, 255, 0.09)',
                 border: '1px solid rgba(95, 135, 255, 0.65)',
                 color: loading ? '#8993a9' : '#dce5ff',
                 borderRadius: 8,
@@ -255,7 +255,7 @@ export default function InvestigateDetail() {
       )}
 
       {error && (
-        <div style={{ border: '1px solid rgba(255, 64, 88, 0.6)', background: 'rgba(255, 64, 88, 0.1)', color: '#ffb3bd', borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13 }}>
+        <div style={{ border: '1px solid rgba(255, 64, 88, 0.6)', background: 'rgba(255, 64, 88, 0.09)', color: '#ffb3bd', borderRadius: 10, padding: 14, marginBottom: 16, fontSize: 13 }}>
           {error}
         </div>
       )}
@@ -263,8 +263,9 @@ export default function InvestigateDetail() {
       <section style={{ margin: '0 26px 36px' }}>
         <div style={{ color: '#f4f6fb', fontSize: 13, fontWeight: 700, margin: '10px 0 14px' }}>Progress</div>
         <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, alignItems: 'start' }}>
-          <div style={{ position: 'absolute', top: 14, left: '9%', right: '9%', height: 4, borderRadius: 999, background: 'linear-gradient(90deg, #0587ff 0 48%, rgba(112, 121, 147, 0.52) 48% 100%)' }} />
-          <ProgressStep active icon={CircleDot} title="Type" subtitle="Categorize mitre" />
+          <div style={{ position: 'absolute', top: 44, left: '9%', right: '29%', height: 4, borderRadius: 999, 
+            background: 'linear-gradient(90deg, #f9251a 0 48%, rgba(112, 121, 147, 0.09) 48% 100%)' }} />
+          <ProgressStep active icon={CircleDot} title="Type" subtitle="Categorize mitre"/>
           <ProgressStep active icon={ClipboardList} title="Context" subtitle="Extract feature" />
           <ProgressStep icon={Search} title="Investigation" subtitle="LLM Processing" />
           <ProgressStep icon={Monitor} title="Recommendation" subtitle="Advisement" />
@@ -279,12 +280,12 @@ export default function InvestigateDetail() {
           </div>
           <div style={{ display: 'grid', gap: 9 }}>
             <Field label="ID" value={alert?.id || target || '-'} mono />
-            <Field label="IP" value={alert?.src_ip || alert?.source_ip || alert?.ip || '-'} mono />
+            <Field label="Source IP" value={alert?.raw_log.contexts.src_ip ||'-'} mono />
             <Field label="Domain name" value={alert?.domain_name || alert?.external_alert_id || '-'} />
-            <Field label="Trace ID" value={alert?.trace_id || alert?.event_id || alert?.external_alert_id || '-'} mono />
+            <Field label="Trace ID" value={alert?.trace_id || '-'} mono />
             <div style={{ height: 14 }} />
-            <Field label="EndPoint Type" value={alert?.endpoint_type || alert?.asset_type || '-'} />
-            <Field label="OS" value={alert?.os || alert?.operating_system || '-'} />
+            <Field label="EndPoint Type" value={alert?.raw_log.contexts.endpoint_type || '-'} />
+            <Field label="OS" value={alert?.raw_log.contexts.os || '-'} />
             <div style={{ height: 14 }} />
             <Field label="Detect Time" value={formatDate(alert?.detected_time)} mono />
             <Field label="Created at" value={formatDate(alert?.created_at)} mono />
@@ -305,23 +306,16 @@ export default function InvestigateDetail() {
           </div>
           <div style={{ ...panelStyle, padding: 26, minHeight: 176 }}>
             <div style={{ color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 800, marginBottom: 22 }}>MITRE ATT&CK</div>
-            <div style={{ display: 'grid', gap: 13, color: '#d7ddeb', fontSize: 13 }}>
-              <div><span style={{ color: '#c2c9d8' }}>Tactic: </span>{latestPrediction.main_tactic || 'none'}</div>
-              <div><span style={{ color: '#c2c9d8' }}>Technique: </span>{latestPrediction.main_technique || 'none'}</div>
-              <div><span style={{ color: '#c2c9d8' }}>Subtechnique : </span>{latestPrediction.sub_technique || 'none'}</div>
+            <div style={{ display: 'grid', gap: 9 }}>
+              <div><span style={{ color: '#c2c9d8' }}>Tactic: </span>{alert?.raw_log.mitre?.[0]?.id}<span>, </span>{alert?.raw_log.mitre?.[1]?.id || 'none'}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Tactic name: </span>{alert?.raw_log.mitre?.[0]?.name_tactics}<span>, </span>{alert?.raw_log.mitre?.[1]?.name_tactics || '-'}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Technique: </span>{alert?.raw_log.mitre?.[0]?.name_technique}<span>, </span>{alert?.raw_log.mitre?.[1]?.name_technique || 'none'}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Subtechnique: </span>{alert?.raw_log.mitre?.[0]?.name_subtechnique}<span>, </span>{alert?.raw_log.mitre?.[1]?.name_subtechnique || 'none'}</div>
             </div>
           </div>
         </div>
       </section>
-
-      {alert?.raw_log && (
-        <section style={{ ...panelStyle, marginTop: 14, padding: 18 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#f4f6fb', fontSize: 13, fontWeight: 700, marginBottom: 12 }}>
-            <TerminalSquare size={15} /> Raw Log
-          </div>
-          <pre style={{ margin: 0, color: '#b8c2d9', fontSize: 12, lineHeight: 1.55, whiteSpace: 'pre-wrap', overflowX: 'auto' }}>{toPretty(alert.raw_log)}</pre>
-        </section>
-      )}
+   
 
       {loading && (
         <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8, color: '#b8c2d9', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>

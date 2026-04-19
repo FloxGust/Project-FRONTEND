@@ -38,7 +38,7 @@ export default function AgentOrchestrator() {
             setRunning(r => ({ ...r, [agentId]: false }))
           }
         } catch { clearInterval(poll); setRunning(r => ({ ...r, [agentId]: false })) }
-      }, 1500)
+      }, 90000)
     } catch { setRunning(r => ({ ...r, [agentId]: false })) }
   }
 
