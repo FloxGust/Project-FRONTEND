@@ -130,6 +130,60 @@ const VerdictOption = ({ label, active }) => (
   </span>
 )
 
+const HighlightedConclusion = ({ value }) => {
+  const parts = String(value).split(/(True Positive|False Positive)/gi)
+
+  return parts.map((part, index) => {
+    const normalized = part.toLowerCase()
+    const isTruePositive = normalized === 'true positive'
+    const isFalsePositive = normalized === 'false positive'
+
+    if (!isTruePositive && !isFalsePositive) return part
+
+    return (
+      <span
+        key={`${part}-${index}`}
+        style={{
+          color: isTruePositive ? '#3fe27f' : '#ff4058',
+          fontWeight: 900,
+        }}
+      >
+        {part}
+      </span>
+    )
+  })
+}
+
+const BehaviorFactorBlock = ({ factor, index }) => {
+  const rows = [
+    ['Validation', factor?.validation],
+    ['Benign indicators', factor?.benignIndicators || factor?.benign_indicators],
+    ['Observed evidence', factor?.observedEvidence || factor?.observed_evidence],
+    ['Recommended response', factor?.recommendedResponse || factor?.recommended_response],
+    ['Suspicious indicators', factor?.suspiciousIndicators || factor?.suspicious_indicators],
+  ].filter(([, value]) => value !== null && value !== undefined && value !== '')
+
+  return (
+    <section style={{ ...panelStyle, minHeight: 120, padding: 24 }}>
+      <h3 style={{ margin: '0 0 14px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>
+        {factor?.factor || `Behavior Factor ${index + 1}`}
+      </h3>
+      <div style={{ display: 'grid', gap: 14 }}>
+        {rows.map(([label, value]) => (
+          <div key={label}>
+            <div style={{ marginBottom: 6, color: '#8f98ad', fontSize: 10, fontWeight: 800, textTransform: 'uppercase' }}>
+              {label}
+            </div>
+            <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+              {Array.isArray(value) ? value.join('\n') : String(value)}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 export default function InvestigateSummary() {
   const navigate = useNavigate()
   const { alertId } = useParams()
@@ -172,6 +226,21 @@ export default function InvestigateSummary() {
   const latestPrediction = predictions[0] || {}
   const latestInvestigation = investigations[0] || {}
   const latestRecommendation = recommendations[0] || {}
+  const investigationData = latestInvestigation?.investigation_data || {}
+  const logClassification = investigationData.logClassification || {}
+  const rawKeyEntities = logClassification.keyEntities || logClassification.key_entities
+  const keyEntities = Array.isArray(rawKeyEntities)
+    ? rawKeyEntities
+    : []
+  const rawBehaviorFactors = investigationData.behaviorFactors
+    || investigationData.behavior_factors
+    || logClassification.behaviorFactors
+    || logClassification.behavior_factors
+    || latestInvestigation.behaviorFactors
+    || latestInvestigation.behavior_factors
+  const behaviorFactors = Array.isArray(rawBehaviorFactors)
+    ? rawBehaviorFactors
+    : []
 
   const title = alert?.alert_name || latestInvestigation.summary || 'Untitled Alert'
   const verdict = statusBadge(latestInvestigation.verdict || alert?.status)
@@ -180,15 +249,11 @@ export default function InvestigateSummary() {
   const source = pickFirst(alert?.source, latestContext.source, latestInvestigation.source)
   const analysisSummary = pickFirst(
     latestInvestigation.summary,
-    latestInvestigation.analysis_summary,
-    latestInvestigation.description,
     'Analysis will appear here after the investigation agent completes this alert.'
   )
-  const reasoning = pickFirst(
-    latestInvestigation.reasoning,
-    latestInvestigation.rationale,
-    latestInvestigation.explanation,
-    'Reasoning details will appear here after the investigation agent completes this alert.'
+  const conclusion = pickFirst(
+    investigationData.conclusion,
+    'Conclusion will appear here after the investigation agent completes this alert.'
   )
   const behaviorAnalysis = pickFirst(
     latestInvestigation.behavior_analysis,
@@ -288,53 +353,97 @@ export default function InvestigateSummary() {
         </div>
       )}
 
-      <section style={{ display: 'grid', gridTemplateColumns: '250px 1fr 250px', gap:16, alignItems: 'start' }}>
-        <aside style={{ ...panelStyle, minHeight: 506, padding: 14, minWidth: 250}}>
+      <section style={{ display: 'grid', gridTemplateColumns: '250px 1fr 250px', gap: 16, alignItems: 'start' }}>
+        <aside style={{ ...panelStyle, minHeight: 506, padding: 14, minWidth: 250 }}>
+
           <h2 style={{ margin: '8px 0 16px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
-            KEY ENTITIES
+            ALERT Details
           </h2>
 
           <div style={{ display: 'grid', gap: 16 }}>
             <EntityRow icon={Monitor} label="ID" value={pickFirst(alert?.id, target)} />
             <EntityRow label="Domain name" value={pickFirst(alert?.domain_name, alert?.external_alert_id)} />
-            <EntityRow label="IP" value={pickFirst(latestContext.src_ip, alert?.src_ip, alert?.source_ip, alert?.ip)} />
+            <EntityRow label="IP" value={pickFirst(latestContext.src_ip, alert?.raw_log?.contexts?.src_ip, alert?.source_ip, alert?.ip)} />
             <EntityRow label="Trace_ID" value={pickFirst(alert?.trace_id, alert?.event_id, alert?.external_alert_id)} />
           </div>
 
-          <div style={{ height: 46 }} />
 
-          <h2 style={{ margin: '0 0 8px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
-            MITRE ATT&CK
-          </h2>
-          <InfoBox>
-            <div>Tactic: {pickFirst(latestPrediction.main_tactic)}</div>
-            <div>Technique: {pickFirst(latestPrediction.main_technique)}</div>
-            <div>{pickFirst(latestPrediction.technique_id, latestPrediction.mitre_id, latestPrediction.sub_technique)}</div>
-          </InfoBox>
+          <div style={{ marginTop: 46 }}>
+            <h1 style={{display:'flex', justifyContent:'Center', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 16, fontWeight: 900, letterSpacing: 0.3 }}>
+              Log Classification
+            </h1>
+            <h2 style={{ margin: '20px 0 16px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
+              KEY ENtities
+            </h2>
 
-          <div style={{ height: 28 }} />
+            <InfoBox>
+              {keyEntities.length > 0 ? (
+                <div style={{ display: 'grid', gap: 8 }}>
+                  {keyEntities.map((entity, index) => (
+                    <div
+                      key={`${entity}-${index}`}
+                      title={entity}
+                      style={{
+                        minWidth: 0,
+                        color: '#dce2f0',
+                        fontFamily: 'JetBrains Mono, monospace',
+                        fontSize: 11,
+                        whiteSpace: 'nowrap',
+                        overflow: 'hidden',
+                        textOverflow: 'ellipsis',
+                      }}
+                    >
+                      {entity}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div>-</div>
+              )}
+            </InfoBox>
 
-          <InfoBox>
-            <div>Log source : {source}</div>
-          </InfoBox>
+            <div style={{ height: 20 }} />
 
-          <div style={{ display: 'grid', gap: 7, marginTop: 16, color: '#dce2f0', fontSize: 12 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-              <span>Detected</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.detected_time || latestContext.created_at)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-              <span>Create at</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.created_at || latestContext.created_at)}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
-              <span>Update at</span>
-              <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.updated_at || latestContext.updated_at)}</span>
+            <h2 style={{ margin: '0 0 8px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
+              MITRE ATT&CK
+            </h2>
+            <InfoBox>
+              <div style={{ display: 'grid', gap: 9 }}>
+                <div><span style={{ color: '#7e7e7e' }}>Tactic: </span>{logClassification?.mitre?.tactic || '-'}</div>
+                <div><span style={{ color: '#7e7e7e' }}>Technique: </span>{logClassification?.mitre?.technique || '-'}</div>
+                <div><span style={{ color: '#7e7e7e' }}>Subtechnique: </span>{logClassification?.mitre?.subTechnique || '-'}</div>
+              </div>
+            </InfoBox>
+            <div style={{ height: 10 }} />
+            <InfoBox>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', alignItems: 'center' }}>
+                <span style={{ color: '#99a3b8', fontSize: 10 }}>Confidence</span>
+                <span style={{ color: '#ff4058', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 900 }}>{confidenceLabel}</span>
+              </div>
+            </InfoBox>
+
+            <InfoBox>
+              <div>Log source : {source}</div>
+            </InfoBox>
+            <div style={{ height: 10 }} />
+            <div style={{ display: 'grid', gap: 7, marginTop: 16, color: '#dce2f0', fontSize: 12 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <span>Detected</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.detected_time || latestContext.created_at)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <span>Create at</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.created_at || latestContext.created_at)}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}>
+                <span>Update at</span>
+                <span style={{ fontFamily: 'JetBrains Mono, monospace' }}>{formatDate(alert?.updated_at || latestContext.updated_at)}</span>
+              </div>
             </div>
           </div>
         </aside>
-
-        <main style={{ display: 'grid', gap: 16, minWidth: 100}}>
+        {/* Main Pannel */}
+        <main style={{ display: 'grid', gap: 16, minWidth: 100 }}>
           <section style={{ ...panelStyle, minHeight: 246, padding: 26 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
               <Sparkles size={15} color="#48c7ff" />
@@ -348,42 +457,36 @@ export default function InvestigateSummary() {
                 <div style={{ color: '#99a3b8', fontSize: 10, marginBottom: 6 }}>Verdict</div>
                 <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
               </div> */}
-              <div>
-                <div style={{ color: '#99a3b8', fontSize: 10, marginBottom: 6 }}>Confidence</div>
-                <div style={{ color: '#ff4058', fontFamily: 'JetBrains Mono, monospace', fontSize: 18, fontWeight: 900 }}>
-                  {confidenceLabel}
-                </div>
-              </div>
             </div>
           </section>
 
           <section style={{ ...panelStyle, minHeight: 194, padding: 26 }}>
-            <h2 style={{ margin: '0 0 18px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Reasoning</h2>
+            <h2 style={{ margin: '0 0 18px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Conclusion</h2>
             <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-              {reasoning}
+              <HighlightedConclusion value={conclusion} />
             </p>
           </section>
 
+          {/* Behavior Factor */}
           <div>
             <h2 style={{ margin: '0 0 16px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Behavior Analysis</h2>
-            <section style={{ ...panelStyle, minHeight: 120, padding: 24 }}>
-              <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-                {behaviorAnalysis}
-              </p>
-            </section>
+            <div style={{ display: 'grid', gap: 12 }}>
+              {behaviorFactors.length > 0 ? (
+                behaviorFactors.map((factor, index) => (
+                  <BehaviorFactorBlock key={`${factor?.factor || 'factor'}-${index}`} factor={factor} index={index} />
+                ))
+              ) : (
+                <section style={{ ...panelStyle, minHeight: 120, padding: 24 }}>
+                  <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+                    {behaviorAnalysis}
+                  </p>
+                </section>
+              )}
+            </div>
           </div>
         </main>
 
         <aside style={{ ...panelStyle, minHeight: 502, padding: 24 }}>
-          <h2 style={{ margin: '0 0 28px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 800 }}>
-            MITRE ATT&CK
-          </h2>
-
-          <div style={{ display: 'grid', gap: 15, color: '#dce2f0', fontSize: 12 }}>
-            <div>Tactic: {pickFirst(latestPrediction.main_tactic)}</div>
-            <div>Technique: {pickFirst(latestPrediction.main_technique)}</div>
-            <div>Subtechnique : {pickFirst(latestPrediction.sub_technique, 'none')}</div>
-          </div>
 
           <div style={{ display: 'grid', gap: 14, marginTop: 28 }}>
             <div style={{ color: '#8f98ad', fontSize: 10, textAlign: 'right' }}>Confidence</div>

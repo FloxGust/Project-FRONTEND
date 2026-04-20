@@ -257,13 +257,13 @@ export default function InvestigateContext() {
       <section style={{ display: 'grid', gridTemplateColumns: '188px minmax(0, 1fr)', gap: 70, alignItems: 'start' }}>
         <aside style={{ ...panelStyle, minHeight: 506, padding: 14, minWidth: 250}}>
           <h2 style={{ margin: '8px 0 16px', color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 800, letterSpacing: 0.3 }}>
-            KEY ENTITIES
+            ALERT Details
           </h2>
 
           <div style={{ display: 'grid', gap: 7 }}>
             <EntityRow icon={Monitor} label="ID" value={pickFirst(alert?.id, target)} />
             <EntityRow label="Domain name" value={pickFirst(alert?.domain_name, alert?.external_alert_id)} />
-            <EntityRow label="IP" value={pickFirst(latestContext.src_ip, alert?.src_ip, alert?.source_ip, alert?.ip)} />
+            <EntityRow label="IP" value={pickFirst(latestContext.src_ip, alert?.raw_log.contexts. src_ip, alert?.source_ip, alert?.ip)} />
             <EntityRow label="Trace_ID" value={pickFirst(alert?.trace_id, alert?.event_id, alert?.external_alert_id)} />
           </div>
 
