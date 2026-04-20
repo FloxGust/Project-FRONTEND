@@ -1,4 +1,4 @@
-import { Outlet, NavLink, useLocation } from 'react-router-dom'
+import { Outlet, NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import {
   Bell,
@@ -12,27 +12,32 @@ import {
   Radio,
   Search,
   Snowflake,
+  LogOut,
+  CircleUserRound,
 } from 'lucide-react'
-import bgImg from '../../bg-img-1.png'
+import bgImg from '../../image 38.png'
+import { clearSession, getAuthenticatedUser } from '../../lib/auth'
 
 const NAV = [
   { to: '/home', icon: Home, label: 'Home' },
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/alerts', icon: Bell, label: 'Alerts' },
-  { to: '/investigate', icon: Search, label: 'Investigate' },
-  { to: '/agents', icon: Bot, label: 'Agents' },
-  { to: '/incidents', icon: FileWarning, label: 'Incidents' },
-  { to: '/sedr', icon: Radio, label: 'Send EDR' },
+  { to: '/alerts', icon: Bot, label: 'Investigate' },
+  // { to: '/investigate', icon: Search, label: 'Investigate' },
+  // { to: '/agents', icon: Bot, label: 'Agents' },
+  // { to: '/incidents', icon: FileWarning, label: 'Incidents' },
+  { to: '/sedr', icon: Radio, label: 'Send Logs' },
   { to: '/about-us', icon: FileWarning, label: 'About Us' },
 ]
 
 export default function Layout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const isHome = location.pathname === '/home'
 
   const [sidebarVisible, setSidebarVisible] = useState(!isHome)
   const [hover, setHover] = useState(false)
   const [now, setNow] = useState(() => new Date())
+  const username = getAuthenticatedUser()
 
   useEffect(() => {
     setSidebarVisible(!isHome)
@@ -53,6 +58,11 @@ export default function Layout() {
     hour12: false,
   })
 
+  const handleLogout = () => {
+    clearSession()
+    navigate('/login', { replace: true })
+  }
+
   return (
     <div
       style={{
@@ -69,20 +79,20 @@ export default function Layout() {
         overflow: 'visible',
       }}
     >
+      {/* Navbar */}
       <aside
         style={{
           width: sidebarVisible ? 210 : 80,
           minHeight: 'calc(99vh - 20px)',
-          maxHeight: '100vh',
           margin: '10px 10px 10px 10px',
           background:
-            'linear-gradient(180deg, rgba(111, 136, 250, 0.05), rgba(3, 6, 19, 0.52))',
-          border: '1px solid rgba(224, 231, 255, 0.18)',
+            'linear-gradient(180deg, rgba(111, 136, 250, 0.09), rgba(3, 6, 19, 0.62))',
+          border: '1px solid rgba(224, 231, 255, 0.12)',
           borderRadius: '18px',
           boxShadow:
             'inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 80px rgba(0, 0, 0, 0.54)',
-          backdropFilter: 'blur(22px) saturate(145%)',
-          WebkitBackdropFilter: 'blur(22px) saturate(145%)',
+          // backdropFilter: 'blur(12px) saturate(100%)',
+          // WebkitBackdropFilter: 'blur(22px) saturate(145%)',
           transition: 'width 0.6s ease, margin 0.6s ease, border-color 0.2s ease',
           overflow: 'auto',
           display: 'flex',
@@ -160,7 +170,7 @@ export default function Layout() {
             </NavLink>
           ))}
         </nav>
-
+         
         <div
           style={{
             padding: sidebarVisible ? '0 30px 24px' : '0 0 24px',
@@ -169,6 +179,59 @@ export default function Layout() {
             width: '100%',
           }}
         >
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'flex-start',
+              justifyContent: 'start',
+              flexDirection: 'column',
+              marginBottom: 62,
+            }}
+          >
+            {sidebarVisible && username && (
+              <div
+                style={{
+                  marginBottom: 12,
+                  // color: "rgba(240, 244, 255, 0.72)",
+                  letterSpacing: 0.5,
+                  fontSize: 14,
+                }}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 25, // ระยะห่าง icon กับ text
+                  }}
+                >
+                  <CircleUserRound size={16} strokeWidth={1.75} />
+                  <span>{username}</span>
+                </div>
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={handleLogout}
+              style={{
+                width: '100%',
+                marginTop: 1,
+                padding:'8px 0' ,
+                // border: '1px solid rgba(224, 231, 255, 0.18)',
+                borderRadius: 8,
+                background: 'rgba(255,255,255,0.02)',
+                color: '#f8fbff',
+                fontSize: 10,
+                letterSpacing: 4,
+                display: 'flex',
+                alignItems: 'center',
+                // justifyContent: 'start',
+                cursor: 'pointer',
+            }}
+            >
+              {sidebarVisible && <LogOut size={13} strokeWidth={1.75} />}
+              {sidebarVisible && <span style={{margin:'0 0 0 30px'}}>LOGOUT</span>}
+            </button>
+          </div>
           {sidebarVisible && (
             <div
               style={{
@@ -183,21 +246,24 @@ export default function Layout() {
               <span>{formattedTime}</span>
             </div>
           )}
+          
           <button
             type="button"
             onClick={() => setSidebarVisible(!sidebarVisible)}
             style={{
               width: '100%',
-              marginTop: 22,
-              padding: sidebarVisible ? 0 : '10px 0',
-              border: 'none',
-              background: 'transparent',
+              marginTop: 16,
+              padding: sidebarVisible ? '8px 0' : '10px 0',
+              border: '1px solid rgba(224, 231, 255, 0.18)',
+              borderRadius: 8,
+              background: 'rgba(255,255,255,0.02)',
               color: '#f8fbff',
               fontSize: 10,
               letterSpacing: 0.9,
               display: 'flex',
               alignItems: 'center',
-              justifyContent: sidebarVisible ? 'space-between' : 'center',
+              justifyContent: sidebarVisible ? 'center' : 'center',
+              gap: 8,
               cursor: 'pointer',
             }}
           >
@@ -238,7 +304,7 @@ export default function Layout() {
         >
           {sidebarVisible ? <PanelLeftClose size={18} strokeWidth={1.5} /> : <PanelLeftOpen size={18} strokeWidth={1.5} />}
         </button> */}
-
+        {/* main */}
         <main
           style={{
             flex: 1,
@@ -251,11 +317,10 @@ export default function Layout() {
           <div
             style={{
               minHeight: 'calc(100vh - 40px)',
-              border: '1px solid rgba(224, 231, 255, 0.07)',
-              borderRadius: 16,
-              background: 'rgba(5, 9, 24, 0.28)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 236, 246, 0.18)',
+              borderRadius: 40, //16px
+              background: 'rgba(5, 9, 24, 0.6)',
+              backdropFilter: 'blur(8px)',
             }}
           >
             <Outlet />

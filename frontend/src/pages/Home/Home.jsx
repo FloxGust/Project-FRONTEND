@@ -1,105 +1,550 @@
+import { ArrowUpRight, Orbit, Radar, ShieldCheck, Sparkles, Workflow } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+
+const STATS = [
+  { label: 'Live Telemetry', value: '6.2M / day' },
+  { label: 'Threat Precision', value: '99.3%' },
+  { label: 'Auto Response', value: '< 200ms' },
+]
+
+const TRUSTED = ['CROWDSTRIKE', 'SPLUNK', 'PALO ALTO', 'CLOUDFLARE', 'MICROSOFT', 'AWS']
+
+const FEATURES = [
+  {
+    icon: Radar,
+    title: 'Predictive Threat Radar',
+    desc: 'Surface weak signals early, before alerts explode into critical incidents.',
+  },
+  {
+    icon: Workflow,
+    title: 'Autonomous Playbooks',
+    desc: 'Contain, enrich, and escalate with adaptive flows built for SOC speed.',
+  },
+  {
+    icon: ShieldCheck,
+    title: 'Decision-Grade Confidence',
+    desc: 'Every recommendation includes evidence trails and explainable AI scoring.',
+  },
+]
 
 export default function Home() {
   const navigate = useNavigate()
-  const cards = [
-    { title: "Real-time Detection", value: "Live", desc: "Monitoring threats continuously" },
-    { title: "AI Confidence", value: "99.1%", desc: "Model prediction accuracy" },
-    { title: "Incidents", value: "128", desc: "Handled this week" },
-  ];
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #0206171e, #020b1f2a, #0206171e)', color: 'white', borderRadius: '30px', border: '1px solid #1f2937', padding: '40px', position: 'relative' }}>
-      {/* glow background */}
-      <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, overflow: 'hidden', pointerEvents: 'none' }}>
-        <div style={{ position: 'absolute', top: '-5rem', left: '25%', height: '400px', width: '400px', borderRadius: '9999px', backgroundColor: 'rgba(6, 182, 212, 0.3)', filter: 'blur(100px)' }} />
-        <div style={{ position: 'absolute', bottom: 0, right: '25%', height: '400px', width: '400px', borderRadius: '9999px', backgroundColor: 'rgba(59, 130, 246, 0.1)', filter: 'blur(120px)' }} />
+    <div className="home-shell">
+      <style>{`
+        .home-shell {
+          --bg: #050816;
+          --card: rgba(8, 14, 35, 0.76);
+          --line: rgba(140, 177, 255, 0.22);
+          --ink: #f5f8ff;
+          --muted: #a8b3d9;
+          --c1: #77e9ff;
+          --c2: #4f7dff;
+          --c3: #5fcbff;
+          position: relative;
+          min-height: 100vh;
+          overflow: hidden;
+          border-radius: 30px;
+          border: 1px solid rgba(149, 176, 255, 0.2);
+          background:
+            radial-gradient(circle at 84% 2%, rgba(51, 108, 255, 0.34), transparent 24%),
+            radial-gradient(circle at 10% 44%, rgba(55, 150, 255, 0.24), transparent 35%),
+            linear-gradient(180deg, #040716 0%, #030513 46%, #02030f 100%);
+          color: var(--ink);
+          font-family: "Avenir Next", "Sora", "Trebuchet MS", sans-serif;
+          isolation: isolate;
+        }
+
+        .home-noise,
+        .home-wave,
+        .home-glow {
+          position: absolute;
+          inset: 0;
+          pointer-events: none;
+        }
+
+        .home-noise {
+          background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+          background-size: 3px 3px;
+          opacity: 0.08;
+        }
+
+        .home-wave::before,
+        .home-wave::after {
+          content: "";
+          position: absolute;
+          width: 62%;
+          border-radius: 56% 44% 58% 42% / 48% 44% 56% 52%;
+          filter: blur(1px);
+          animation: float-wave 8s ease-in-out infinite;
+        }
+
+        .home-wave::before {
+          height: 360px;
+          right: -4%;
+          bottom: 7%;
+          background: linear-gradient(120deg, rgba(112, 229, 255, 0.6), rgba(31, 72, 226, 0.3));
+          box-shadow: 0 0 120px rgba(80, 149, 255, 0.35);
+          transform: rotate(-8deg);
+        }
+
+        .home-wave::after {
+          height: 260px;
+          left: 12%;
+          bottom: -8%;
+          opacity: 0.72;
+          background: linear-gradient(120deg, rgba(106, 241, 255, 0.4), rgba(18, 56, 190, 0.25));
+          box-shadow: 0 0 140px rgba(105, 173, 255, 0.28);
+          animation-delay: 1.1s;
+        }
+
+        .home-glow::before {
+          content: "";
+          position: absolute;
+          width: 400px;
+          height: 400px;
+          border-radius: 50%;
+          top: -8%;
+          right: -8%;
+          background: radial-gradient(circle at center, rgba(107, 197, 255, 0.28), transparent 65%);
+        }
+
+        .home-wrap {
+          position: relative;
+          z-index: 1;
+          padding: 34px 38px 42px;
+        }
+
+        .home-nav {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 22px;
+          padding: 14px 18px;
+          border: 1px solid rgba(173, 197, 255, 0.2);
+          border-radius: 18px;
+          background: rgba(7, 11, 26, 0.66);
+          backdrop-filter: blur(10px);
+        }
+
+        .home-brand {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          letter-spacing: 0.08em;
+          font-size: 14px;
+          font-weight: 600;
+        }
+
+        .home-brand-dot {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: linear-gradient(145deg, #ddf4ff, #4d96ff 70%);
+          box-shadow: 0 0 34px rgba(104, 198, 255, 0.7);
+        }
+
+        .home-nav-links {
+          display: flex;
+          align-items: center;
+          gap: 24px;
+          color: #d3dcff;
+          font-size: 13px;
+        }
+
+        .home-nav-links button,
+        .home-btn {
+          cursor: pointer;
+          border: 0;
+          background: transparent;
+          color: inherit;
+          font: inherit;
+        }
+
+        .home-pill {
+          border-radius: 999px;
+          padding: 9px 16px;
+          font-weight: 600;
+          color: #ecf9ff;
+          background: linear-gradient(120deg, rgba(84, 170, 255, 0.9), rgba(80, 111, 255, 0.86));
+          box-shadow: 0 10px 36px rgba(64, 98, 255, 0.4);
+        }
+
+        .home-hero {
+          margin-top: 34px;
+          border: 1px solid var(--line);
+          border-radius: 28px;
+          padding: 56px 56px 26px;
+          background: linear-gradient(180deg, rgba(10, 18, 42, 0.8), rgba(5, 10, 28, 0.72));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 35px 90px rgba(0,0,0,0.45);
+        }
+
+        .home-badge {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          border-radius: 999px;
+          font-size: 12px;
+          padding: 8px 14px;
+          color: #d0dcff;
+          background: rgba(25, 39, 84, 0.72);
+          border: 1px solid rgba(157, 184, 255, 0.3);
+        }
+
+        .home-headline {
+          margin: 22px 0 0;
+          max-width: 900px;
+          font-size: clamp(36px, 5.6vw, 74px);
+          line-height: 1.02;
+          letter-spacing: -0.03em;
+        }
+
+        .home-headline em {
+          font-family: "Times New Roman", Georgia, serif;
+          font-style: italic;
+          font-weight: 500;
+          color: #b9ddff;
+        }
+
+        .home-sub {
+          margin: 20px 0 0;
+          max-width: 700px;
+          color: var(--muted);
+          line-height: 1.7;
+          font-size: clamp(14px, 1.7vw, 18px);
+        }
+
+        .home-cta {
+          margin-top: 28px;
+          display: flex;
+          flex-wrap: wrap;
+          gap: 12px;
+        }
+
+        .home-btn-pri,
+        .home-btn-sec {
+          border-radius: 999px;
+          padding: 12px 20px;
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .home-btn-pri {
+          background: linear-gradient(120deg, #e4fbff, #9dd0ff 44%, #5e86ff);
+          color: #021020;
+          font-weight: 700;
+          box-shadow: 0 12px 30px rgba(95, 160, 255, 0.42);
+        }
+
+        .home-btn-sec {
+          color: #dce8ff;
+          border: 1px solid rgba(183, 204, 255, 0.36);
+          background: rgba(15, 25, 53, 0.62);
+        }
+
+        .home-btn-pri:hover,
+        .home-btn-sec:hover {
+          transform: translateY(-2px);
+        }
+
+        .home-stat-row {
+          margin-top: 34px;
+          border-top: 1px solid rgba(156, 182, 255, 0.24);
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 14px;
+          padding-top: 18px;
+        }
+
+        .home-stat {
+          border-radius: 14px;
+          padding: 13px 14px;
+          background: rgba(7, 14, 32, 0.6);
+          border: 1px solid rgba(131, 162, 245, 0.22);
+        }
+
+        .home-stat-label {
+          color: #9fb4e2;
+          font-size: 12px;
+        }
+
+        .home-stat-value {
+          margin-top: 6px;
+          font-size: 22px;
+          font-weight: 700;
+          letter-spacing: -0.02em;
+        }
+
+        .home-trust {
+          margin-top: 34px;
+          border: 1px solid var(--line);
+          border-radius: 18px;
+          background: rgba(4, 8, 24, 0.66);
+          padding: 16px 20px;
+          display: grid;
+          grid-template-columns: 240px 1fr;
+          gap: 16px;
+          align-items: center;
+        }
+
+        .home-trust-note {
+          font-size: 11px;
+          color: #8ca0cc;
+          letter-spacing: 0.08em;
+        }
+
+        .home-trust-logos {
+          display: grid;
+          grid-template-columns: repeat(6, minmax(0, 1fr));
+          gap: 8px;
+        }
+
+        .home-logo {
+          text-align: center;
+          font-size: 12px;
+          color: #cad8ff;
+          font-weight: 600;
+          letter-spacing: 0.05em;
+          padding: 8px 4px;
+          border-radius: 10px;
+          border: 1px solid rgba(139, 166, 232, 0.2);
+          background: rgba(11, 18, 42, 0.6);
+        }
+
+        .home-features {
+          margin-top: 34px;
+        }
+
+        .home-title {
+          margin: 0;
+          font-size: clamp(30px, 3.8vw, 46px);
+          letter-spacing: -0.02em;
+        }
+
+        .home-title em {
+          font-family: "Times New Roman", Georgia, serif;
+          font-style: italic;
+          font-weight: 500;
+          color: #9fd4ff;
+        }
+
+        .home-feature-grid {
+          margin-top: 18px;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 16px;
+        }
+
+        .home-feature-card {
+          border-radius: 20px;
+          border: 1px solid rgba(129, 164, 255, 0.28);
+          background: linear-gradient(170deg, rgba(16, 27, 66, 0.8), rgba(5, 10, 27, 0.9));
+          padding: 24px;
+          min-height: 210px;
+          transition: border-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .home-feature-card:hover {
+          transform: translateY(-4px);
+          border-color: rgba(134, 227, 255, 0.52);
+        }
+
+        .home-icon-wrap {
+          width: 40px;
+          height: 40px;
+          border-radius: 10px;
+          display: grid;
+          place-items: center;
+          background: linear-gradient(145deg, rgba(117, 219, 255, 0.32), rgba(92, 121, 255, 0.22));
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.18);
+          color: #d4eeff;
+        }
+
+        .home-process {
+          margin-top: 22px;
+          border-radius: 20px;
+          border: 1px solid rgba(131, 161, 240, 0.22);
+          padding: 20px;
+          background: rgba(8, 15, 36, 0.72);
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+        }
+
+        .home-step {
+          border-radius: 14px;
+          padding: 14px;
+          border: 1px solid rgba(148, 175, 245, 0.2);
+          background: rgba(11, 20, 49, 0.58);
+        }
+
+        .home-step small {
+          color: #7ca2ec;
+          font-size: 11px;
+          letter-spacing: 0.08em;
+        }
+
+        .home-step p {
+          margin: 9px 0 0;
+          color: #e3ecff;
+          line-height: 1.5;
+          font-size: 13px;
+        }
+
+        @keyframes float-wave {
+          0%, 100% { transform: translateY(0) rotate(-8deg); }
+          50% { transform: translateY(-14px) rotate(-4deg); }
+        }
+
+        @media (max-width: 1080px) {
+          .home-nav-links {
+            display: none;
+          }
+
+          .home-trust {
+            grid-template-columns: 1fr;
+          }
+
+          .home-trust-logos {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+          }
+
+          .home-feature-grid,
+          .home-process {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+          }
+        }
+
+        @media (max-width: 760px) {
+          .home-wrap {
+            padding: 18px 14px 26px;
+          }
+
+          .home-nav {
+            padding: 12px;
+          }
+
+          .home-hero {
+            margin-top: 16px;
+            padding: 30px 18px 20px;
+          }
+
+          .home-stat-row,
+          .home-feature-grid,
+          .home-process,
+          .home-trust-logos {
+            grid-template-columns: 1fr;
+          }
+        }
+      `}</style>
+
+      <div className="home-noise" />
+      <div className="home-glow" />
+      <div className="home-wave" />
+
+      <div className="home-wrap">
+        <header className="home-nav">
+          <div className="home-brand">
+            <span className="home-brand-dot" />
+            PEARLGUARD X
+          </div>
+          <nav className="home-nav-links">
+            <button onClick={() => navigate('/dashboard')}>Platform</button>
+            <button onClick={() => navigate('/alerts')}>Live Incidents</button>
+            <button onClick={() => navigate('/about-us')}>About</button>
+          </nav>
+          <button className="home-pill" onClick={() => navigate('/dashboard')}>
+            Online now
+          </button>
+        </header>
+
+        <section className="home-hero">
+          <div className="home-badge">
+            <Sparkles size={14} />
+            Security Intelligence Engine
+          </div>
+          <h1 className="home-headline">
+            Command Your SOC
+            <br />
+            With <em>Autonomous Precision</em>
+          </h1>
+          <p className="home-sub">
+            From first signal to final containment, PearlGuard orchestrates AI analysts, context,
+            and response actions in one cinematic control layer.
+          </p>
+
+          <div className="home-cta">
+            <button className="home-btn home-btn-pri" onClick={() => navigate('/dashboard')}>
+              Enter Command Center
+              <ArrowUpRight size={16} />
+            </button>
+            <button className="home-btn home-btn-sec" onClick={() => navigate('/alerts')}>
+              Launch Live Demo
+              <Orbit size={16} />
+            </button>
+          </div>
+
+          <div className="home-stat-row">
+            {STATS.map((item) => (
+              <article key={item.label} className="home-stat">
+                <div className="home-stat-label">{item.label}</div>
+                <div className="home-stat-value">{item.value}</div>
+              </article>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-trust">
+          <div className="home-trust-note">TRUSTED IN GLOBAL SECOPS STACKS</div>
+          <div className="home-trust-logos">
+            {TRUSTED.map((name) => (
+              <div key={name} className="home-logo">
+                {name}
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="home-features">
+          <h2 className="home-title">
+            Designed To Outrun <em>Modern Attacks</em>
+          </h2>
+
+          <div className="home-feature-grid">
+            {FEATURES.map(({ icon: Icon, title, desc }) => (
+              <article key={title} className="home-feature-card">
+                <div className="home-icon-wrap">
+                  <Icon size={20} />
+                </div>
+                <h3 style={{ margin: '16px 0 0', fontSize: 23 }}>{title}</h3>
+                <p style={{ marginTop: 12, color: '#9eb2e5', lineHeight: 1.6 }}>{desc}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="home-process">
+            <article className="home-step">
+              <small>01 / INGEST</small>
+              <p>Collect logs, events, and network traces continuously.</p>
+            </article>
+            <article className="home-step">
+              <small>02 / CORRELATE</small>
+              <p>Fuse telemetry with entity context and historical behavior.</p>
+            </article>
+            <article className="home-step">
+              <small>03 / DECIDE</small>
+              <p>Score threat confidence and suggest highest-impact action.</p>
+            </article>
+            <article className="home-step">
+              <small>04 / RESPOND</small>
+              <p>Execute playbooks and notify the right team instantly.</p>
+            </article>
+          </div>
+        </section>
       </div>
-
-      {/* navbar */}
-      <header style={{ position: 'relative', zIndex: 10, display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '20px 40px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-          <div style={{ height: '40px', width: '40px', borderRadius: '9999px', background: 'linear-gradient(to bottom right, white, #67e8f9)', boxShadow: '0 0 40px rgba(56,189,248,0.6)' }} />
-          <span style={{ fontSize: '1.125rem', fontWeight: 600, letterSpacing: '0.025em' }}>PearlGuard</span>
-        </div>
-
-        <div style={{ display: 'flex', gap: '32px', fontSize: '0.875rem', color: 'rgba(207, 250, 254, 0.7)' }}>
-          <span onClick={() => navigate('/dashboard')} style={{ cursor: 'pointer' }}>Solutions</span>
-          <span onClick={() => navigate('/alerts')} style={{ cursor: 'pointer' }}>Dashbord</span>
-          <span onClick={() => navigate('/about-us')} style={{ cursor: 'pointer' }}>About Us</span>
-        </div>
-
-        <button onClick={() => navigate('/dashboard')} style={{ borderRadius: '9999px', background: 'linear-gradient(to right, #67e8f9, #3b82f6)', padding: '8px 20px', color: 'black', fontWeight: 500, border: 'none', boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)', cursor: 'pointer' }}>
-          Get Started
-        </button>
-      </header>
-
-      {/* hero */}
-      <section style={{ position: 'relative', zIndex: 10, padding: '80px 40px 64px 40px' }}>
-        <h1 style={{ fontSize: '3.75rem', fontWeight: 600, lineHeight: 1.25, maxWidth: '56rem', margin: 0 }}>
-          Cybersecurity
-          <span style={{ display: 'block', background: 'linear-gradient(to right, white, #a5f3fc, #60a5fa)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', color: 'transparent' }}>
-            powered by AI intelligence
-          </span>
-        </h1>
-
-        <p style={{ marginTop: '24px', color: '#cbd5e1', maxWidth: '42rem' }}>
-          ____________________________________________
-        </p>
-
-        <div style={{ marginTop: '32px', display: 'flex', gap: '16px' }}>
-          <button onClick={() => navigate('/dashboard')} style={{ padding: '12px 24px', borderRadius: '9999px', backgroundColor: '#67e8f9', color: 'black', fontWeight: 500, border: 'none', boxShadow: '0 0 40px rgba(56,189,248,0.5)', cursor: 'pointer' }}>
-            Explore
-          </button>
-          <button onClick={() => navigate('/alerts')} style={{ padding: '12px 24px', borderRadius: '9999px', border: '1px solid rgba(255,255,255,0.2)', color: 'white', backgroundColor: 'transparent', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)', cursor: 'pointer' }}>
-            Live Demo
-          </button>
-        </div>
-      </section>
-
-      {/* dashboard preview */}
-      <section style={{ position: 'relative', zIndex: 10, padding: '0 40px 80px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px' }}>
-          {cards.map((c) => (
-            <div
-              key={c.title}
-              style={{ borderRadius: '24px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', padding: '24px', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1)' }}
-            >
-              <div style={{ fontSize: '0.875rem', color: 'rgba(165, 243, 252, 0.7)' }}>{c.title}</div>
-              <div style={{ fontSize: '1.875rem', fontWeight: 600, margin: '8px 0' }}>{c.value}</div>
-              <div style={{ fontSize: '0.875rem', color: '#94a3b8', margin: 0 }}>{c.desc}</div>
-            </div>
-          ))}
-        </div>
-
-        {/* center pearl visual */}
-        <div style={{ marginTop: '64px', display: 'flex', justifyContent: 'center' }}>
-          <div style={{ position: 'relative', height: '16rem', width: '16rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <div style={{ position: 'absolute', top: 0, right: 0, bottom: 0, left: 0, borderRadius: '9999px', border: '1px solid rgba(103, 232, 249, 0.2)' }} />
-            <div style={{ height: '10rem', width: '10rem', borderRadius: '9999px', background: 'linear-gradient(to bottom right, white, #cffafe, #60a5fa)', boxShadow: '0 0 100px rgba(125,211,252,0.8)' }} />
-          </div>
-        </div>
-      </section>
-
-      {/* feature */}
-      <section style={{ padding: '0 40px 96px 40px' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: '24px' }}>
-          <div style={{ padding: '24px', borderRadius: '24px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Threat Analysis</h3>
-            <p style={{ marginTop: '12px', color: '#94a3b8', margin: '12px 0 0 0' }}>Analyze logs and detect anomalies instantly</p>
-          </div>
-
-          <div style={{ padding: '24px', borderRadius: '24px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>AI Context Engine</h3>
-            <p style={{ marginTop: '12px', color: '#94a3b8', margin: '12px 0 0 0' }}>Understand attack patterns with AI context</p>
-          </div>
-
-          <div style={{ padding: '24px', borderRadius: '24px', backgroundColor: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', backdropFilter: 'blur(4px)', WebkitBackdropFilter: 'blur(4px)' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600, margin: 0 }}>Automated Response</h3>
-            <p style={{ marginTop: '12px', color: '#94a3b8', margin: '12px 0 0 0' }}>Reduce manual SOC workload with automation</p>
-          </div>
-        </div>
-      </section>
     </div>
-  );
+  )
 }

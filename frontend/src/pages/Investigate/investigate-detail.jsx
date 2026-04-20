@@ -176,8 +176,8 @@ export default function InvestigateDetail() {
         minHeight: 'calc(100vh - 40px)',
         padding: '20px 20px',
         color: '#f7f8fb',
-        background:
-          'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.2), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 74%), #05081441',
+        // background:
+          // 'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.2), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 74%), #05081441',
       }}
     >
       <InvestigateHeader />

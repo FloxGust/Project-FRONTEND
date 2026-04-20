@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight, RefreshCw, Search } from 'lucide-react'
 
 import { alertsApi } from '../../api'
+import { RGBAFormat } from 'three/src/constants.js'
 
 const normalizeSeverity = (value) => {
   const lower = String(value || '').toLowerCase()
@@ -177,15 +178,15 @@ export default function AlertQueue() {
         return bTime - aTime
       })
   }, [alerts, filter, search])
-
+  // main
   return (
-    <div style={{ padding: 24 }}>
+    <div style={{ padding: 24}}>
       <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
         <div>
           <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace', letterSpacing: 2, textTransform: 'uppercase' }}>
             PAIAC
           </div>
-          <h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 600, color: '#f9fafb' }}>Alert Queue</h1>
+          <h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 600, color: '#f9fafb' }}>Investigations</h1>
           <div style={{ marginTop: 4, fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace' }}>
             SOURCE: /api/alerts
           </div>
@@ -217,7 +218,7 @@ export default function AlertQueue() {
             display: 'flex',
             alignItems: 'center',
             gap: 8,
-            background: '#181818',
+            background: '#181818', // Searchbox
             border: '1px solid #1f2937',
             borderRadius: 6,
             padding: '0 12px',
@@ -262,11 +263,11 @@ export default function AlertQueue() {
         ))}
       </div>
 
+        {/* Table */}
       <div style={{ marginBottom: 8, fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace' }}>
-        ROWS: {filteredAlerts.length}
+        TOTAL: {filteredAlerts.length}
       </div>
-
-      <div style={{ background: '#181818', border: '1px solid #1f2937', borderRadius: 8, overflow: 'hidden' }}>
+      <div style={{ background: '#001437fa', border: '1px solid #1f2937', borderRadius: 8, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #1f2937' }}>

@@ -4,8 +4,8 @@
 
 :root {
   /* --bg: #0d151f; */
-  --bg: #4bff3b;
-  --surface: #0051ff;
+  --bg: #ebebeb;
+  --surface: #000f2e6b;
   --border: #1f2937;
   --accent: #00d4ff;
   --critical: #ff3b3b;
@@ -24,7 +24,7 @@
 
 body {
   background: var(--bg);
-  color: #ff3b3b;
+  color: #ffffff;
   font-family: 'IBM Plex Sans', sans-serif;
   margin: 0;
 }
