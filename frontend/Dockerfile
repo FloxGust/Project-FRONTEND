@@ -2,13 +2,13 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-# copy เฉพาะ dependency ก่อน
-COPY package.json package-lock.json ./
+# Copy dependency manifests first (if lockfile exists, include it)
+COPY package*.json ./
 
-# ใช้ cache layer ตรงนี้
-RUN npm ci
+# Use npm ci when lockfile exists, otherwise fallback to npm install
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
-# ค่อย copy source code
+# Copy source code
 COPY . .
 
 EXPOSE 5173
