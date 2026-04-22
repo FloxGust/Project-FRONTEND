@@ -197,7 +197,7 @@ export default function AlertQueue() {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            background: '#1f2937',
+            background: '#111111',
             border: '1px solid #374151',
             color: '#9ca3af',
             borderRadius: 6,
@@ -267,7 +267,8 @@ export default function AlertQueue() {
       <div style={{ marginBottom: 8, fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace' }}>
         TOTAL: {filteredAlerts.length}
       </div>
-      <div style={{ background: '#001437fa', border: '1px solid #1f2937', borderRadius: 8, overflow: 'hidden' }}>
+      {/* ปรับสีตาราง */}
+      <div style={{ background: '#0f0f0f', border: '1px solid #1f2937', borderRadius: 8, overflow: 'hidden' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #1f2937' }}>

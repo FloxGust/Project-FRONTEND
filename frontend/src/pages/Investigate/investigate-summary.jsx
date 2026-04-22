@@ -4,6 +4,7 @@ import {
   AlertTriangle,
   Copy,
   Monitor,
+  RefreshCw,
   Search,
   Sparkles,
   SquareChevronLeft,
@@ -241,6 +242,7 @@ export default function InvestigateSummary() {
   const behaviorFactors = Array.isArray(rawBehaviorFactors)
     ? rawBehaviorFactors
     : []
+  const refreshTarget = String(alertId || target || '').trim()
 
   const title = alert?.alert_name || latestInvestigation.summary || 'Untitled Alert'
   const verdict = statusBadge(latestInvestigation.verdict || alert?.status)
@@ -263,12 +265,18 @@ export default function InvestigateSummary() {
   )
   const mitreRows = predictions.length > 0 ? predictions.slice(0, 3) : [latestPrediction, latestPrediction, latestPrediction]
 
+  const handleRefresh = () => {
+    if (!refreshTarget || loading) return
+    loadAlertBundle(refreshTarget)
+  }
+
   return (
     <div
       style={{
         minHeight: 'calc(100vh - 40px)',
-        padding: '0 4px 4px',
+        padding: '50px 20px',
         color: '#f7f8fb',
+        borderRadius: 14,
         background:
           'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.22), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 34%), #050814',
       }}
@@ -300,6 +308,24 @@ export default function InvestigateSummary() {
           <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
           <Chip tone="yellow">{statusText(alert?.status)}</Chip>
           <Chip tone="blue">LLM</Chip>
+          <button
+            onClick={handleRefresh}
+            disabled={loading || !refreshTarget}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: loading || !refreshTarget ? '#fffff1a' : '#fffff1a',
+              border: '1px solid #374151',
+              color: loading || !refreshTarget ? '#667085' : '#9ca3af',
+              borderRadius: 6,
+              padding: '7px 14px',
+              cursor: loading || !refreshTarget ? 'not-allowed' : 'pointer',
+              fontSize: 12,
+            }}
+          >
+            <RefreshCw size={13} />
+          </button>
         </div>
       </section>
 
@@ -487,7 +513,7 @@ export default function InvestigateSummary() {
         </main>
 
         <aside style={{ ...panelStyle, minHeight: 502, padding: 24 }}>
-
+{/* 
           <div style={{ display: 'grid', gap: 14, marginTop: 28 }}>
             <div style={{ color: '#8f98ad', fontSize: 10, textAlign: 'right' }}>Confidence</div>
             {mitreRows.map((prediction, index) => (
@@ -517,13 +543,42 @@ export default function InvestigateSummary() {
                 <VerdictOption label="Malicious" active={verdict === 'Malicious'} />
               </div>
             </div>
-          </div>
+          </div> */}
         </aside>
       </section>
 
       {loading && (
-        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8, color: '#b8c2d9', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-          <AlertTriangle size={14} /> Loading data from server...
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(4, 7, 18, 0.64)',
+            backdropFilter: 'blur(2px)',
+            display: 'grid',
+            placeItems: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: 'min(360px, calc(100vw - 32px))',
+              borderRadius: 12,
+              border: '1px solid rgba(255, 64, 88, 0.55)',
+              background: 'linear-gradient(180deg, rgba(19, 23, 45, 0.98), rgba(10, 14, 30, 0.98))',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.42)',
+              padding: '18px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              color: '#f6d1d7',
+              fontSize: 12,
+              fontFamily: 'JetBrains Mono, monospace',
+              fontWeight: 700,
+            }}
+          >
+            <AlertTriangle size={16} color="#ff6b7d" />
+            <span>Loading data from server...</span>
+          </div>
         </div>
       )}
     </div>

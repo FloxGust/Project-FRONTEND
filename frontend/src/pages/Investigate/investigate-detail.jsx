@@ -8,6 +8,7 @@ import {
   Copy,
   Database,
   Monitor,
+  RefreshCw,
   SquareChevronLeft,
   Search,
   TerminalSquare,
@@ -164,20 +165,29 @@ export default function InvestigateDetail() {
   const investigations = useMemo(() => bundle?.investigations || [], [bundle])
   // const latestPrediction = predictions[0] || {}
   const latestInvestigation = investigations[0] || {}
+  const refreshTarget = String(alertId || target || '').trim()
   const badge = statusBadge(latestInvestigation.verdict || alert?.status)
 
   const title = alert?.alert_name || latestInvestigation.summary || ''
   const source = alert?.source || latestInvestigation.source || '-'
   const severity = alert?.severity || latestInvestigation.severity || '-'
+  const contexts = alert?.raw_log?.contexts || {}
+  const mitre = Array.isArray(alert?.raw_log?.mitre) ? alert.raw_log.mitre : []
+
+  const handleRefresh = () => {
+    if (!refreshTarget || loading) return
+    loadAlertBundle(refreshTarget)
+  }
 
   return (
     <div
-      style={{
+       style={{
         minHeight: 'calc(100vh - 40px)',
-        padding: '20px 20px',
+        padding: '50px 20px',
         color: '#f7f8fb',
-        // background:
-          // 'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.2), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 74%), #05081441',
+        borderRadius: 14,
+        background:
+          'radial-gradient(circle at 80% 68%, rgba(29, 129, 177, 0.22), transparent 28%), radial-gradient(circle at 20% 82%, rgba(42, 58, 129, 0.2), transparent 34%), #050814',
       }}
     >
       <InvestigateHeader />
@@ -207,6 +217,24 @@ export default function InvestigateDetail() {
           <Chip tone="red">{badge.label === 'Malicious' ? 'o Malicious' : badge.label}</Chip>
           <Chip tone="yellow">{statusText(alert?.status)}</Chip>
           <Chip tone="blue">LLM</Chip>
+           <button
+            onClick={handleRefresh}
+            disabled={loading || !refreshTarget}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              background: loading || !refreshTarget ? '#fffff1a' : '#fffff1a',
+              border: '1px solid #374151',
+              color: loading || !refreshTarget ? '#667085' : '#9ca3af',
+              borderRadius: 6,
+              padding: '7px 14px',
+              cursor: loading || !refreshTarget ? 'not-allowed' : 'pointer',
+              fontSize: 12,
+            }}
+          >
+            <RefreshCw size={13} />
+          </button>
         </div>
       </section>
 
@@ -280,12 +308,12 @@ export default function InvestigateDetail() {
           </div>
           <div style={{ display: 'grid', gap: 9 }}>
             <Field label="ID" value={alert?.id || target || '-'} mono />
-            <Field label="Source IP" value={alert?.raw_log.contexts.src_ip ||'-'} mono />
+            <Field label="Source IP" value={contexts.src_ip || '-'} mono />
             <Field label="Domain name" value={alert?.domain_name || alert?.external_alert_id || '-'} />
             <Field label="Trace ID" value={alert?.trace_id || '-'} mono />
             <div style={{ height: 14 }} />
-            <Field label="EndPoint Type" value={alert?.raw_log.contexts.endpoint_type || '-'} />
-            <Field label="OS" value={alert?.raw_log.contexts.os || '-'} />
+            <Field label="EndPoint Type" value={contexts.endpoint_type || '-'} />
+            <Field label="OS" value={contexts.os || '-'} />
             <div style={{ height: 14 }} />
             <Field label="Detect Time" value={formatDate(alert?.detected_time)} mono />
             <Field label="Created at" value={formatDate(alert?.created_at)} mono />
@@ -307,10 +335,10 @@ export default function InvestigateDetail() {
           <div style={{ ...panelStyle, padding: 26, minHeight: 176 }}>
             <div style={{ color: '#ffffff', fontFamily: 'JetBrains Mono, monospace', fontSize: 13, fontWeight: 800, marginBottom: 22 }}>MITRE ATT&CK</div>
             <div style={{ display: 'grid', gap: 9 }}>
-              <div><span style={{ color: '#c2c9d8' }}>Tactic: </span>{alert?.raw_log.mitre?.[0]?.id}<span>, </span>{alert?.raw_log.mitre?.[1]?.id || 'none'}</div>
-              <div><span style={{ color: '#c2c9d8' }}>Tactic name: </span>{alert?.raw_log.mitre?.[0]?.name_tactics}<span>, </span>{alert?.raw_log.mitre?.[1]?.name_tactics || '-'}</div>
-              <div><span style={{ color: '#c2c9d8' }}>Technique: </span>{alert?.raw_log.mitre?.[0]?.name_technique}<span>, </span>{alert?.raw_log.mitre?.[1]?.name_technique || 'none'}</div>
-              <div><span style={{ color: '#c2c9d8' }}>Subtechnique: </span>{alert?.raw_log.mitre?.[0]?.name_subtechnique}<span>, </span>{alert?.raw_log.mitre?.[1]?.name_subtechnique || 'none'}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Tactic: </span>{mitre[0]?.id || 'none'}<span>, </span>{mitre[1]?.id}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Tactic name: </span>{mitre[0]?.name_tactics || 'none'}<span>, </span>{mitre[1]?.name_tactics}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Technique: </span>{mitre[0]?.name_technique || 'none'}<span>, </span>{mitre[1]?.name_technique}</div>
+              <div><span style={{ color: '#c2c9d8' }}>Subtechnique: </span>{mitre[0]?.name_subtechnique || 'none'}<span>, </span>{mitre[1]?.name_subtechnique}</div>
             </div>
           </div>
         </div>
@@ -318,8 +346,37 @@ export default function InvestigateDetail() {
    
 
       {loading && (
-        <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 8, color: '#b8c2d9', fontSize: 12, fontFamily: 'JetBrains Mono, monospace' }}>
-          <AlertTriangle size={14} /> Loading data from server...
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            background: 'rgba(4, 7, 18, 0.64)',
+            backdropFilter: 'blur(2px)',
+            display: 'grid',
+            placeItems: 'center',
+            zIndex: 9999,
+          }}
+        >
+          <div
+            style={{
+              width: 'min(360px, calc(100vw - 32px))',
+              borderRadius: 12,
+              border: '1px solid rgba(255, 64, 88, 0.55)',
+              background: 'linear-gradient(180deg, rgba(19, 23, 45, 0.98), rgba(10, 14, 30, 0.98))',
+              boxShadow: '0 24px 60px rgba(0, 0, 0, 0.42)',
+              padding: '18px 20px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
+              color: '#f6d1d7',
+              fontSize: 12,
+              fontFamily: 'JetBrains Mono, monospace',
+              fontWeight: 700,
+            }}
+          >
+            <AlertTriangle size={16} color="#ff6b7d" />
+            <span>Loading data from server...</span>
+          </div>
         </div>
       )}
     </div>

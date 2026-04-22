@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Activity, AlertTriangle, ShieldAlert, TrendingUp } from 'lucide-react'
+import { Activity, AlertTriangle, RefreshCw, ShieldAlert, TrendingUp } from 'lucide-react'
 import { Bar, BarChart, Cell, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { alertsApi } from '../../api'
@@ -33,6 +33,12 @@ function StatCard({ icon: Icon, label, value, color, sub }) {
 
 const normalizeStatus = (value) => String(value || '').toLowerCase()
 const normalizeSeverity = (value) => String(value || '').toLowerCase()
+const toDisplayDateTime = (value) => {
+  if (!value) return '-'
+  const parsed = new Date(value)
+  if (Number.isNaN(parsed.getTime())) return '-'
+  return parsed.toLocaleString()
+}
 
 const computeStatsFromAlerts = (alerts) => {
   return {
@@ -46,38 +52,61 @@ const computeStatsFromAlerts = (alerts) => {
   }
 }
 
+const extractAlertRows = (payload) => {
+  if (Array.isArray(payload)) return payload
+  if (Array.isArray(payload?.items)) return payload.items
+  if (Array.isArray(payload?.results)) return payload.results
+  if (Array.isArray(payload?.data)) return payload.data
+  return []
+}
+
 export default function Dashboard() {
   const [alerts, setAlerts] = useState([])
   const [stats, setStats] = useState(EMPTY_STATS)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
+  const [lastUpdatedAt, setLastUpdatedAt] = useState('')
 
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true)
+  const loadDashboardData = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const pageSize = 200
+      const maxRows = 20000
+      let skip = 0
+      const allRows = []
+
+      while (skip < maxRows) {
+        const response = await alertsApi.list({ skip, limit: pageSize })
+        const batch = extractAlertRows(response?.data)
+        allRows.push(...batch)
+        if (batch.length < pageSize) break
+        skip += pageSize
+      }
+
+      setAlerts(allRows)
+
       try {
-        const [alertsResponse, statsResponse] = await Promise.all([
-          alertsApi.list({ skip: 0, limit: 500 }),
-          alertsApi.stats(),
-        ])
-        const rows = Array.isArray(alertsResponse?.data) ? alertsResponse.data : []
-        setAlerts(rows)
+        const statsResponse = await alertsApi.stats()
         setStats({ ...EMPTY_STATS, ...(statsResponse?.data || {}) })
       } catch {
-        try {
-          const fallback = await alertsApi.list({ skip: 0, limit: 500 })
-          const rows = Array.isArray(fallback?.data) ? fallback.data : []
-          setAlerts(rows)
-          setStats(computeStatsFromAlerts(rows))
-        } catch {
-          setAlerts([])
-          setStats(EMPTY_STATS)
-        }
-      } finally {
-        setLoading(false)
+        setStats(computeStatsFromAlerts(allRows))
       }
-    }
 
-    load()
+      setLastUpdatedAt(new Date().toISOString())
+    } catch (err) {
+      const detail = err?.response?.data?.detail
+      setError(typeof detail === 'string' ? detail : err?.message || 'Unable to load dashboard data')
+      setAlerts([])
+      setStats(EMPTY_STATS)
+      setLastUpdatedAt('')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    loadDashboardData()
   }, [])
 
   const severityData = useMemo(
@@ -127,13 +156,42 @@ export default function Dashboard() {
 
   return (
     <div style={{ padding: 24 }}>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace', letterSpacing: 2, textTransform: 'uppercase' }}>Security Operations Center</div>
-        <h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 600, color: '#f9fafb' }}>Dashboard</h1>
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', gap: 16 }}>
+        <div>
+          <div style={{ fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace', letterSpacing: 2, textTransform: 'uppercase' }}>Security Operations Center</div>
+          <h1 style={{ margin: '4px 0 0', fontSize: 22, fontWeight: 600, color: '#f9fafb' }}>Dashboard</h1>
+          <div style={{ marginTop: 4, fontSize: 11, color: '#6b7280', fontFamily: 'JetBrains Mono, monospace' }}>
+            SOURCE: /api/alerts | UPDATED: {toDisplayDateTime(lastUpdatedAt)}
+          </div>
+        </div>
+        <button
+          onClick={loadDashboardData}
+          disabled={loading}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 6,
+            background: loading ? '#121826' : '#1f2937',
+            border: '1px solid #374151',
+            color: loading ? '#667085' : '#9ca3af',
+            borderRadius: 6,
+            padding: '7px 14px',
+            cursor: loading ? 'not-allowed' : 'pointer',
+            fontSize: 12,
+          }}
+        >
+          <RefreshCw size={13} /> Refresh
+        </button>
       </div>
 
+      {error && (
+        <div style={{ border: '1px solid rgba(255, 64, 88, 0.55)', background: 'rgba(255, 64, 88, 0.09)', color: '#ffb3bd', borderRadius: 8, padding: '10px 14px', marginBottom: 16, fontSize: 12 }}>
+          {error}
+        </div>
+      )}
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        <StatCard icon={ShieldAlert} label="Total Alerts" value={loading ? '-' : stats.total} color="#00d4ff" sub="From server dataset" />
+        <StatCard icon={ShieldAlert} label="Total Alerts" value={loading ? '-' : stats.total} color="#00d4ff" sub="From real DB dataset" />
         <StatCard icon={AlertTriangle} label="Critical" value={loading ? '-' : stats.critical} color="#ff3b3b" sub="Highest severity" />
         <StatCard icon={Activity} label="Open" value={loading ? '-' : stats.open} color="#ffd700" sub="Pending or processing" />
         <StatCard icon={TrendingUp} label="Escalated" value={loading ? '-' : stats.escalated} color="#ff8c00" sub="Escalation in progress" />

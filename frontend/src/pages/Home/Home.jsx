@@ -1,10 +1,39 @@
 import { ArrowUpRight, Orbit, Radar, ShieldCheck, Sparkles, Workflow } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import PearlguardLogo from '../../PearlguardLogo.png'
 
-const STATS = [
-  { label: 'Live Telemetry', value: '6.2M / day' },
-  { label: 'Threat Precision', value: '99.3%' },
-  { label: 'Auto Response', value: '< 200ms' },
+const IS_PUBLIC_DOMAIN = String(import.meta.env.VITE_PUBLIC_DOMAIN || 'false').toLowerCase() === 'true'
+
+const CONNECTION_GROUPS = [
+  {
+    key: 'database',
+    label: 'Database',
+    endpoints: [
+      { key: 'db-local', label: 'localhost:8000', url: IS_PUBLIC_DOMAIN ? '/db-local-proxy/' : '/db-proxy/' },
+      { key: 'db-public', label: 'db.paiac.store', url: 'https://db.paiac.store/', mode: 'no-cors' },
+    ],
+  },
+  {
+    key: 'agent',
+    label: 'Agent',
+    endpoints: [
+      {
+        key: 'agent-local',
+        label: 'localhost:9003',
+        url: '/sedr-publish/api/publish-js',
+        acceptedStatuses: [200, 405],
+      },
+    ],
+  },
+  {
+    key: 'backend',
+    label: 'Backend',
+    endpoints: [
+      { key: 'backend-current', label: 'Current Website', url: '/api/alerts/stats' },
+      { key: 'backend-public', label: 'front.paiac.store', url: 'https://front.paiac.store/api/alerts/stats', mode: 'no-cors' },
+    ],
+  },
 ]
 
 const TRUSTED = ['CROWDSTRIKE', 'SPLUNK', 'PALO ALTO', 'CLOUDFLARE', 'MICROSOFT', 'AWS']
@@ -29,6 +58,105 @@ const FEATURES = [
 
 export default function Home() {
   const navigate = useNavigate()
+  const [statusMap, setStatusMap] = useState({})
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const refreshStatusesRef = useRef(async () => {})
+
+  const flattenedEndpoints = useMemo(
+    () => CONNECTION_GROUPS.flatMap((group) => group.endpoints),
+    []
+  )
+
+  useEffect(() => {
+    let cancelled = false
+
+    const checkEndpoint = async (endpoint) => {
+      const controller = new AbortController()
+      const timeoutId = window.setTimeout(() => controller.abort(), 4500)
+      try {
+        const response = await fetch(endpoint.url, {
+          method: 'GET',
+          mode: endpoint.mode || 'same-origin',
+          cache: 'no-store',
+          signal: controller.signal,
+        })
+        const isNoCors = endpoint.mode === 'no-cors'
+        if (isNoCors) {
+          return {
+            state: 'degraded',
+            code: 'opaque',
+          }
+        }
+
+        const acceptedStatuses = Array.isArray(endpoint.acceptedStatuses) ? endpoint.acceptedStatuses : []
+        if (acceptedStatuses.includes(response.status)) {
+          return {
+            state: 'online',
+            code: String(response.status),
+          }
+        }
+
+        if (!response.ok) {
+          return {
+            state: 'offline',
+            code: String(response.status),
+          }
+        }
+
+        return {
+          state: 'online',
+          code: String(response.status),
+        }
+      } catch {
+        return {
+          state: 'offline',
+          code: 'ERR',
+        }
+      } finally {
+        window.clearTimeout(timeoutId)
+      }
+    }
+
+    const refreshStatuses = async (showChecking = false) => {
+      setIsRefreshing(true)
+      if (showChecking) {
+        setStatusMap((prev) => {
+          const next = { ...prev }
+          flattenedEndpoints.forEach((endpoint) => {
+            next[endpoint.key] = { state: 'checking', code: '...' }
+          })
+          return next
+        })
+      }
+
+      const results = await Promise.all(
+        flattenedEndpoints.map(async (endpoint) => ({
+          key: endpoint.key,
+          status: await checkEndpoint(endpoint),
+        }))
+      )
+
+      if (cancelled) return
+
+      setStatusMap((prev) => {
+        const next = { ...prev }
+        results.forEach(({ key, status }) => {
+          next[key] = status
+        })
+        return next
+      })
+      setIsRefreshing(false)
+    }
+
+    refreshStatusesRef.current = (showChecking = false) => refreshStatuses(showChecking)
+    refreshStatuses(true)
+    const timer = window.setInterval(() => refreshStatuses(false), 3600000)
+
+    return () => {
+      cancelled = true
+      window.clearInterval(timer)
+    }
+  }, [flattenedEndpoints])
 
   return (
     <div className="home-shell">
@@ -269,13 +397,69 @@ export default function Home() {
         .home-stat-label {
           color: #9fb4e2;
           font-size: 12px;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
         }
 
-        .home-stat-value {
-          margin-top: 6px;
-          font-size: 22px;
-          font-weight: 700;
-          letter-spacing: -0.02em;
+        .home-stat-list {
+          margin-top: 8px;
+          display: grid;
+          gap: 8px;
+        }
+
+        .home-stat-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          border: 1px solid rgba(131, 162, 245, 0.18);
+          border-radius: 9px;
+          padding: 8px 10px;
+          background: rgba(6, 12, 28, 0.55);
+          font-size: 12px;
+        }
+
+        .home-stat-endpoint {
+          color: #d8e6ff;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        .home-stat-status {
+          display: inline-flex;
+          align-items: center;
+          gap: 6px;
+          font-family: "JetBrains Mono", monospace;
+          font-size: 11px;
+          white-space: nowrap;
+        }
+
+        .home-dot {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          display: inline-block;
+        }
+
+        .home-dot-online {
+          background: #2ed57f;
+          box-shadow: 0 0 10px rgba(46, 213, 127, 0.65);
+        }
+
+        .home-dot-offline {
+          background: #ff5b5b;
+          box-shadow: 0 0 10px rgba(255, 91, 91, 0.45);
+        }
+
+        .home-dot-degraded {
+          background: #ffb020;
+          box-shadow: 0 0 10px rgba(255, 176, 32, 0.45);
+        }
+
+        .home-dot-checking {
+          background: #62b8ff;
+          box-shadow: 0 0 10px rgba(98, 184, 255, 0.45);
         }
 
         .home-trust {
@@ -448,7 +632,8 @@ export default function Home() {
       <div className="home-wrap">
         <header className="home-nav">
           <div className="home-brand">
-            <span className="home-brand-dot" />
+            <img src={PearlguardLogo} alt="Pearlguard Logo" width={46} height={'auto'} />
+            {/* <span className="home-brand-dot" /> */}
             PEARLGUARD X
           </div>
           <nav className="home-nav-links">
@@ -456,8 +641,8 @@ export default function Home() {
             <button onClick={() => navigate('/alerts')}>Live Incidents</button>
             <button onClick={() => navigate('/about-us')}>About</button>
           </nav>
-          <button className="home-pill" onClick={() => navigate('/dashboard')}>
-            Online now
+          <button className="home-pill" onClick={() => refreshStatusesRef.current(false)}>
+            {isRefreshing ? 'Checking...' : 'Check Status'}
           </button>
         </header>
 
@@ -488,10 +673,39 @@ export default function Home() {
           </div>
 
           <div className="home-stat-row">
-            {STATS.map((item) => (
-              <article key={item.label} className="home-stat">
-                <div className="home-stat-label">{item.label}</div>
-                <div className="home-stat-value">{item.value}</div>
+            {CONNECTION_GROUPS.map((group) => (
+              <article key={group.key} className="home-stat">
+                <div className="home-stat-label">{group.label}</div>
+                <div className="home-stat-list">
+                  {group.endpoints.map((endpoint) => {
+                    const current = statusMap[endpoint.key] || { state: 'checking', code: '...' }
+                    const stateClass =
+                      current.state === 'online'
+                        ? 'home-dot-online'
+                        : current.state === 'degraded'
+                        ? 'home-dot-degraded'
+                        : current.state === 'offline'
+                        ? 'home-dot-offline'
+                        : 'home-dot-checking'
+                    const text =
+                      current.state === 'online'
+                        ? `ONLINE (${current.code})`
+                        : current.state === 'degraded'
+                        ? `DEGRADED (${current.code})`
+                        : current.state === 'offline'
+                        ? `OFFLINE (${current.code})`
+                        : 'CHECKING'
+                    return (
+                      <div key={endpoint.key} className="home-stat-item">
+                        <span className="home-stat-endpoint">{endpoint.label}</span>
+                        <span className="home-stat-status">
+                          <span className={`home-dot ${stateClass}`} />
+                          {text}
+                        </span>
+                      </div>
+                    )
+                  })}
+                </div>
               </article>
             ))}
           </div>

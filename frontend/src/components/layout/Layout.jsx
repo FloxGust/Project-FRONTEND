@@ -11,11 +11,12 @@ import {
   PanelLeftOpen,
   Radio,
   Search,
-  Snowflake,
   LogOut,
   CircleUserRound,
 } from 'lucide-react'
+import PearlguardLogo from '../../PearlguardLogo.png'
 import bgImg from '../../image 38.png'
+import bgImg_2 from '../../bg-img-3.png'
 import { clearSession, getAuthenticatedUser } from '../../lib/auth'
 
 const NAV = [
@@ -66,12 +67,15 @@ export default function Layout() {
   return (
     <div
       style={{
+        // ปรับ background
         display: 'flex',
         width: '100%',
-        maxHeight: '100vh',
-        backgroundImage: `url(${bgImg}), radial-gradient(circle at 80% 18%, rgba(40, 72, 155, 0.28), 
-                        transparent 28%), radial-gradient(circle at 52% 5%, rgba(104, 92, 188, 0.14), transparent 16%)`,
-        backgroundColor: '#020511',
+        minHeight: '100vh',
+        backgroundImage: `linear-gradient(180deg, hsla(0, 0%, 5%, 1) 0%, hsla(0, 0%, 5%, 0.3) 50%, hsla(0, 0%, 5%, 0.5) 100%), url(${bgImg_2})`,
+        // backgroundColor: '#101010',
+        // backgroundImage: `url(${bgImg_2}), radial-gradient(circle at 80% 18%, rgba(40, 72, 155, 0.28), 
+        //                 transparent 28%), radial-gradient(circle at 52% 5%, rgba(104, 92, 188, 0.14), transparent 16%)`,
+        // backgroundColor: '#020511',
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundRepeat: 'no-repeat',
@@ -117,7 +121,7 @@ export default function Layout() {
             width: '100%',
           }}
         >
-          <Snowflake size={24} strokeWidth={1.35} color="#f8fbff" />
+          <img src={PearlguardLogo} alt="Pearlguard Logo" width={36} height={'auto'} />
           {sidebarVisible && (
             <div
               style={{
@@ -139,6 +143,7 @@ export default function Layout() {
               key={to}
               to={to}
               style={({ isActive }) => ({
+                // ปรับ Active Navbar
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: sidebarVisible ? 'flex-start' : 'center',
@@ -156,7 +161,7 @@ export default function Layout() {
                 border: isActive ? '1px solid rgba(184, 183, 255, 0.18)' : '1px solid transparent',
                 borderRadius: 8,
                 boxShadow: isActive
-                  ? 'inset 0 1px 0 rgba(255,255,255,0.08), 0 10px 30px rgba(69, 36, 88, 0.32)'
+                  ? 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 10px rgba(69, 36, 88, 0.32)'
                   : 'none',
                 backdropFilter: isActive ? 'blur(14px)' : 'none',
                 WebkitBackdropFilter: isActive ? 'blur(14px)' : 'none',
@@ -305,6 +310,8 @@ export default function Layout() {
           {sidebarVisible ? <PanelLeftClose size={18} strokeWidth={1.5} /> : <PanelLeftOpen size={18} strokeWidth={1.5} />}
         </button> */}
         {/* main */}
+        {/* ปรับ Main Pannel */}
+        
         <main
           style={{
             flex: 1,
@@ -317,9 +324,9 @@ export default function Layout() {
           <div
             style={{
               minHeight: 'calc(100vh - 40px)',
-              border: '1px solid rgba(255, 236, 246, 0.18)',
-              borderRadius: 40, //16px
-              background: 'rgba(5, 9, 24, 0.6)',
+              border: '1px solid rgba(255, 236, 246, 0.09)',
+              borderRadius: 20, //16px
+              background: 'rgba(1, 1, 1, 0.2)',
               backdropFilter: 'blur(8px)',
             }}
           >

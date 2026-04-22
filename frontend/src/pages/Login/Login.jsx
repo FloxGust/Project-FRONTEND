@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { authenticate, isAuthenticated, loginSession } from '../../lib/auth'
 import wavesVideo from '../../White Waves - Background.mp4'
+import PearlguardLogo from '../../../src/PearlguardLogo.png'
+import Pearlguard from '../../../src/Pearlguard.png'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -64,14 +66,45 @@ export default function Login() {
         style={{
           gridColumn: 1,
           gridRow: 1,
-          marginTop: '16%',
-          marginLeft: '16%',
+          marginTop: '-10%',
+          marginLeft: '6%',
           color: '#ffffff',
+          display: 'flex',            // 👈 เปลี่ยนตรงนี้
+          alignItems: 'center',       // จัดแนวตั้งให้ตรงกัน
+          gap: '0px',                // ระยะห่างระหว่าง img กับ text
+          zIndex: 100,
         }}
       >
-        <p style={{ fontSize: '1.5rem', color: 'rgba(235, 239, 255, 0.72)' }}>Welcome To</p>
-        <h1 style={{ color: '#fff1e6', fontFamily: 'Segoe Script', fontSize: '6.5rem', boxShadow: 'initial', fontWeight: 'bold' }}>Pearl Guard</h1>
-        <h2 style={{ wordSpacing: '5px' }}>The Cyber-Security Agentic AI </h2>
+        <img
+          src={PearlguardLogo}
+          alt="Pearlguard Logo"
+          style={{width: 420, height: 'auto', marginRight: -100 }}
+        />
+        <img
+          src={Pearlguard}
+          alt="Pearlguard"
+          style={{width: 720, height: 'auto', marginRight: -200 }}
+        />
+        {/* <div>
+          <p style={{ fontSize: '1.5rem',fontFamily: "Damion", color: 'rgba(235, 239, 255, 0.72)' }}>
+            Welcome To
+          </p>
+          <h1
+            style={{
+              color: '#fff1e6',
+              fontSize: '7.5rem',
+              fontFamily: "Damion",
+              fontWeight: 900,
+              fontStyle: "normal",
+              letterSpacing: '10px',
+            }}
+          >
+            Pearl Guard
+          </h1>
+          <h2 style={{fontFamily: "Damion",wordSpacing: '5px' }}>
+            The Cyber-Security Agentic AI
+          </h2>
+        </div> */}
       </div>
       {/* Overlay Gradient */}
       <div
