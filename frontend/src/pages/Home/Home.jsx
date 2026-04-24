@@ -1,7 +1,7 @@
 import { ArrowUpRight, Orbit, Radar, ShieldCheck, Sparkles, Workflow } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import PearlguardLogo from '../../PearlguardLogo.png'
+import PearlguardLogo from '../../assets/image/PearlguardLogo.png'
 
 const IS_PUBLIC_DOMAIN = String(import.meta.env.VITE_PUBLIC_DOMAIN || 'false').toLowerCase() === 'true'
 
@@ -10,8 +10,8 @@ const CONNECTION_GROUPS = [
     key: 'database',
     label: 'Database',
     endpoints: [
-      { key: 'db-local', label: 'localhost:8000', url: IS_PUBLIC_DOMAIN ? '/db-local-proxy/' : '/db-proxy/' },
-      { key: 'db-public', label: 'db.paiac.store', url: 'https://db.paiac.store/', mode: 'no-cors' },
+      { key: 'db-local', label: '', url: IS_PUBLIC_DOMAIN ? '/db-local-proxy/' : '/db-proxy/' },
+      // { key: 'db-public', label: 'db.paiac.store', url: 'https://db.paiac.store/', mode: 'no-cors' },
     ],
   },
   {
@@ -20,7 +20,7 @@ const CONNECTION_GROUPS = [
     endpoints: [
       {
         key: 'agent-local',
-        label: 'localhost:9003',
+        // label: 'localhost:9003',
         url: '/sedr-publish/api/publish-js',
         acceptedStatuses: [200, 405],
       },
@@ -30,8 +30,8 @@ const CONNECTION_GROUPS = [
     key: 'backend',
     label: 'Backend',
     endpoints: [
-      { key: 'backend-current', label: 'Current Website', url: '/api/alerts/stats' },
-      { key: 'backend-public', label: 'front.paiac.store', url: 'https://front.paiac.store/api/alerts/stats', mode: 'no-cors' },
+      { key: 'backend-current', label: '', url: '/api/alerts/stats' },
+      // { key: 'backend-public', label: 'front.paiac.store', url: 'https://front.paiac.store/api/alerts/stats', mode: 'no-cors' },
     ],
   },
 ]
@@ -412,7 +412,7 @@ export default function Home() {
           align-items: center;
           justify-content: space-between;
           gap: 10px;
-          border: 1px solid rgba(131, 162, 245, 0.18);
+          // border: 1px solid rgba(131, 162, 245, 0.18);
           border-radius: 9px;
           padding: 8px 10px;
           background: rgba(6, 12, 28, 0.55);
@@ -634,7 +634,7 @@ export default function Home() {
           <div className="home-brand">
             <img src={PearlguardLogo} alt="Pearlguard Logo" width={46} height={'auto'} />
             {/* <span className="home-brand-dot" /> */}
-            PEARLGUARD X
+            PROBE SCURUTINY
           </div>
           <nav className="home-nav-links">
             <button onClick={() => navigate('/dashboard')}>Platform</button>
@@ -697,7 +697,7 @@ export default function Home() {
                         : 'CHECKING'
                     return (
                       <div key={endpoint.key} className="home-stat-item">
-                        <span className="home-stat-endpoint">{endpoint.label}</span>
+                        {/* <span className="home-stat-endpoint">{endpoint.label}</span> */}
                         <span className="home-stat-status">
                           <span className={`home-dot ${stateClass}`} />
                           {text}

@@ -157,6 +157,29 @@ export default function InvestigateContext() {
   const latestContext = contexts[0] || {}
   const latestPrediction = predictions[0] || {}
   const latestInvestigation = investigations[0] || {}
+  const isModelTypePrediction = useMemo(() => {
+    const normalize = (value) => String(value || '').trim().toLowerCase()
+
+    const directSources = [
+      bundle?.result_type_prediction?.source,
+      bundle?.result_type_prediction?.Source,
+      bundle?.resultTypePrediction?.source,
+      bundle?.resultTypePrediction?.Source,
+      latestPrediction?.source,
+      latestPrediction?.Source,
+    ]
+    if (directSources.some((sourceValue) => normalize(sourceValue) === 'model')) return true
+
+    if (Array.isArray(bundle?.result_type_prediction)) {
+      return bundle.result_type_prediction.some(
+        (item) => normalize(item?.source || item?.Source) === 'model'
+      )
+    }
+
+    return predictions.some(
+      (item) => normalize(item?.source || item?.Source) === 'model'
+    )
+  }, [bundle, latestPrediction, predictions])
   const refreshTarget = String(alertId || target || '').trim()
 
   const contextData = latestContext.context_data || {}
@@ -207,9 +230,9 @@ export default function InvestigateContext() {
           {title}
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
-          <Chip tone="yellow">{statusText(alert?.status)}</Chip>
-          <Chip tone="blue">LLM</Chip>
+          {/* <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip> */}
+          {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
+          {isModelTypePrediction && <Chip tone="blue">LLM</Chip>}
           <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}

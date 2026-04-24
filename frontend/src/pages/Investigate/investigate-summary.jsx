@@ -227,6 +227,35 @@ export default function InvestigateSummary() {
   const latestPrediction = predictions[0] || {}
   const latestInvestigation = investigations[0] || {}
   const latestRecommendation = recommendations[0] || {}
+  const isModelTypePrediction = useMemo(() => {
+    const normalize = (value) => String(value || '').trim().toLowerCase()
+
+    const directSources = [
+      bundle?.result_type_prediction?.source,
+      bundle?.result_type_prediction?.Source,
+      bundle?.resultTypePrediction?.source,
+      bundle?.resultTypePrediction?.Source,
+      latestPrediction?.source,
+      latestPrediction?.Source,
+    ]
+    if (directSources.some((sourceValue) => normalize(sourceValue) === 'model')) return true
+
+    if (Array.isArray(bundle?.result_type_prediction)) {
+      return bundle.result_type_prediction.some(
+        (item) => normalize(item?.source || item?.Source) === 'model'
+      )
+    }
+
+    return predictions.some(
+      (item) => normalize(item?.source || item?.Source) === 'model'
+    )
+  }, [bundle, latestPrediction, predictions])
+  const socRecommendationContent = useMemo(() => {
+    const socRecommendation = recommendations.find(
+      (recommendation) => String(recommendation?.type || '').toLowerCase() === 'soc'
+    )
+    return socRecommendation?.content
+  }, [recommendations])
   const investigationData = latestInvestigation?.investigation_data || {}
   const logClassification = investigationData.logClassification || {}
   const rawKeyEntities = logClassification.keyEntities || logClassification.key_entities
@@ -259,9 +288,13 @@ export default function InvestigateSummary() {
   )
   const behaviorAnalysis = pickFirst(
     latestInvestigation.behavior_analysis,
+    'Behavior analysis is waiting for additional investigation output.'
+  )
+  const recommendationContent = pickFirst(
+    socRecommendationContent,
     latestRecommendation.content,
     latestRecommendation.summary,
-    'Behavior analysis is waiting for additional investigation output.'
+    'Recommendation is waiting for additional investigation output.'
   )
   const mitreRows = predictions.length > 0 ? predictions.slice(0, 3) : [latestPrediction, latestPrediction, latestPrediction]
 
@@ -305,9 +338,9 @@ export default function InvestigateSummary() {
           {title}
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
-          <Chip tone="yellow">{statusText(alert?.status)}</Chip>
-          <Chip tone="blue">LLM</Chip>
+          {/* <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip> */}
+          {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
+          {isModelTypePrediction && <Chip tone="blue">LLM</Chip>}
           <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}
@@ -479,20 +512,14 @@ export default function InvestigateSummary() {
               {analysisSummary}
             </p>
             <div style={{ display: 'flex', alignItems: 'end', gap: 26 }}>
-              {/* <div>
+              <div>
                 <div style={{ color: '#99a3b8', fontSize: 10, marginBottom: 6 }}>Verdict</div>
                 <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
-              </div> */}
+              </div>
             </div>
           </section>
 
-          <section style={{ ...panelStyle, minHeight: 194, padding: 26 }}>
-            <h2 style={{ margin: '0 0 18px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Conclusion</h2>
-            <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
-              <HighlightedConclusion value={conclusion} />
-            </p>
-          </section>
-
+          
           {/* Behavior Factor */}
           <div>
             <h2 style={{ margin: '0 0 16px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Behavior Analysis</h2>
@@ -510,9 +537,22 @@ export default function InvestigateSummary() {
               )}
             </div>
           </div>
+
+          <section style={{ ...panelStyle, minHeight: 120, padding: 24 }}>
+            <h2 style={{ margin: '0 0 12px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Recommendation</h2>
+            <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 'calc(1.6em + 4px)', whiteSpace: 'pre-wrap' }}>
+              {recommendationContent}
+            </p>
+          </section>
         </main>
 
-        <aside style={{ ...panelStyle, minHeight: 502, padding: 24 }}>
+        <aside style={{ ...panelStyle, minHeight: 60, padding: 24 }}>
+          <div style={{ display: 'grid', gap: 1, marginTop: 5 }}>
+            <h2 style={{ margin: '0 0 18px', color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Conclusion</h2>
+            <p style={{ margin: 0, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
+              <HighlightedConclusion value={conclusion} />
+            </p>
+          </div>
 {/* 
           <div style={{ display: 'grid', gap: 14, marginTop: 28 }}>
             <div style={{ color: '#8f98ad', fontSize: 10, textAlign: 'right' }}>Confidence</div>

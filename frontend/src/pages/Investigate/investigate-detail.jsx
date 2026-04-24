@@ -41,6 +41,12 @@ const formatDate = (value) => {
 }
 
 const statusText = (value) => String(value || 'in process').replace(/_/g, ' ')
+const normalizeStatus = (value) => String(value || '').trim().toUpperCase()
+const normalizeSeverity = (value) => {
+  const lower = String(value || '').toLowerCase()
+  if (['critical', 'high', 'medium', 'low'].includes(lower)) return lower
+  return 'unknown'
+}
 
 const statusBadge = (status) => {
   const normalized = String(status || '').toLowerCase()
@@ -104,6 +110,38 @@ const Chip = ({ children, tone = 'blue' }) => {
   )
 }
 
+function SeverityBadge({ severity }) {
+  const colors = {
+    critical: '#ff3b3b',
+    high: '#ff8c00',
+    medium: '#ffd700',
+    low: '#00d48a',
+    unknown: '#6b7280',
+  }
+
+  const normalized = normalizeSeverity(severity)
+  const color = colors[normalized]
+
+  return (
+    <span
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        padding: '3px 10px',
+        borderRadius: 999,
+        border: `1px solid ${color}`,
+        background: `${color}1f`,
+        color,
+        fontSize: 11,
+        fontWeight: 700,
+        textTransform: 'capitalize',
+      }}
+    >
+      {normalized}
+    </span>
+  )
+}
+
 const ProgressStep = ({ icon: Icon, title, subtitle, active }) => (
   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 22, minWidth: 112 }}>
     <div
@@ -114,8 +152,8 @@ const ProgressStep = ({ icon: Icon, title, subtitle, active }) => (
         display: 'grid',
         placeItems: 'center',
         border: `1px solid ${active ? '#ffffff' : 'rgb(255, 255, 255)'}`,
-        background: active ? 'hsla(0, 0%, 100%, 0.51)' : 'rgba(8, 10, 22, 0.09)',
-        color: active ? '#ffffff' : '#b5bfd4',
+        background: active ? 'hsla(0, 0%, 100%, 0.94)' : 'rgba(8, 10, 22, 0.09)',
+        color: active ? '#000000' : '#b5bfd4',
       }}
     >
       <Icon size={15} />
@@ -163,8 +201,10 @@ export default function InvestigateDetail() {
   const alert = bundle?.alert || null
   const predictions = useMemo(() => bundle?.predictions || [], [bundle])
   const investigations = useMemo(() => bundle?.investigations || [], [bundle])
-  // const latestPrediction = predictions[0] || {}
+  const recommendations = useMemo(() => bundle?.recommendations || [], [bundle])
+  const latestPrediction = predictions[0] || {}
   const latestInvestigation = investigations[0] || {}
+  const latestRecommendation = recommendations[0] || {}
   const refreshTarget = String(alertId || target || '').trim()
   const badge = statusBadge(latestInvestigation.verdict || alert?.status)
 
@@ -173,6 +213,65 @@ export default function InvestigateDetail() {
   const severity = alert?.severity || latestInvestigation.severity || '-'
   const contexts = alert?.raw_log?.contexts || {}
   const mitre = Array.isArray(alert?.raw_log?.mitre) ? alert.raw_log.mitre : []
+
+  const typeStatus = normalizeStatus(alert?.status)
+  const contextStatus = normalizeStatus(
+    bundle?.result_type_prediction?.status
+    || latestPrediction?.status
+  )
+  const investigationStatus = normalizeStatus(
+    bundle?.result_investigation?.status
+    || latestInvestigation?.status
+  )
+  const recommendationStatus = normalizeStatus(
+    bundle?.recommendation?.status
+    || latestRecommendation?.status
+  )
+  const isModelTypePrediction = useMemo(() => {
+    const normalize = (value) => String(value || '').trim().toLowerCase()
+
+    const directSources = [
+      bundle?.result_type_prediction?.source,
+      bundle?.result_type_prediction?.Source,
+      bundle?.resultTypePrediction?.source,
+      bundle?.resultTypePrediction?.Source,
+      latestPrediction?.source,
+      latestPrediction?.Source,
+    ]
+    if (directSources.some((sourceValue) => normalize(sourceValue) === 'model')) return true
+
+    if (Array.isArray(bundle?.result_type_prediction)) {
+      return bundle.result_type_prediction.some(
+        (item) => normalize(item?.source || item?.Source) === 'model'
+      )
+    }
+
+    return predictions.some(
+      (item) => normalize(item?.source || item?.Source) === 'model'
+    )
+  }, [bundle, latestPrediction, predictions])
+
+  const passType = typeStatus === 'RECEIVED'
+  const passContext = contextStatus === 'RECEIVED'
+  const passInvestigation = investigationStatus === 'RECEIVED'
+  const passRecommendation = recommendationStatus === 'RECEIVED'
+  const passCompleted = recommendationStatus === 'RECEIVED'
+
+  // Gate each next step by the previous step so progress is strictly sequential.
+  const isTypeActive = passType
+  const isContextActive = isTypeActive && passContext
+  const isInvestigationActive = isContextActive && passInvestigation
+  const isRecommendationActive = isInvestigationActive && passRecommendation
+  const isCompletedActive = isRecommendationActive && passCompleted
+  const activeSteps = [
+    isTypeActive,
+    isContextActive,
+    isInvestigationActive,
+    isRecommendationActive,
+    isCompletedActive,
+  ].filter(Boolean).length
+  const lastActiveIndex = Math.max(0, activeSteps - 1)
+  const progressPercent = activeSteps <= 1 ? 0 : (lastActiveIndex / 4) * 100
 
   const handleRefresh = () => {
     if (!refreshTarget || loading) return
@@ -214,9 +313,9 @@ export default function InvestigateDetail() {
           {title}
         </div>
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-          <Chip tone="red">{badge.label === 'Malicious' ? 'o Malicious' : badge.label}</Chip>
-          <Chip tone="yellow">{statusText(alert?.status)}</Chip>
-          <Chip tone="blue">LLM</Chip>
+          {/* <Chip tone="red">{badge.label === 'Malicious' ? 'o Malicious' : badge.label}</Chip> */}
+          {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
+          {isModelTypePrediction && <Chip tone="blue">LLM</Chip>}
            <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}
@@ -289,15 +388,35 @@ export default function InvestigateDetail() {
       )}
 
       <section style={{ margin: '0 26px 36px' }}>
-        <div style={{ color: '#f4f6fb', fontSize: 13, fontWeight: 700, margin: '10px 0 14px' }}>Progress</div>
+        <div style={{ color: '#f4fbfb', fontSize: 13, fontWeight: 700, margin: '10px 0 14px' }}>Progress</div>
         <div style={{ position: 'relative', display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 12, alignItems: 'start' }}>
-          <div style={{ position: 'absolute', top: 44, left: '9%', right: '29%', height: 4, borderRadius: 999, 
-            background: 'linear-gradient(90deg, #f9251a 0 48%, rgba(112, 121, 147, 0.09) 48% 100%)' }} />
-          <ProgressStep active icon={CircleDot} title="Type" subtitle="Categorize mitre"/>
-          <ProgressStep active icon={ClipboardList} title="Context" subtitle="Extract feature" />
-          <ProgressStep icon={Search} title="Investigation" subtitle="LLM Processing" />
-          <ProgressStep icon={Monitor} title="Recommendation" subtitle="Advisement" />
-          <ProgressStep icon={Check} title="Completed" subtitle="" />
+          <div
+            style={{
+              position: 'absolute',
+              top: 44,
+              left: '10%',
+              right: '10%',
+              height: 4,
+              borderRadius: 999,
+              background: 'rgba(228, 228, 228, 0.2)',
+            }}
+          />
+          <div
+            style={{
+              position: 'absolute',
+              top: 44,
+              left: '10%',
+              width: `${progressPercent * 0.8}%`,
+              height: 4,
+              borderRadius: 999,
+              background: '#1aeaf9',
+            }}
+          />
+          <ProgressStep active={isTypeActive} icon={CircleDot} title="Type" subtitle="Categorize mitre"/>
+          <ProgressStep active={isContextActive} icon={ClipboardList} title="Context" subtitle="Extract feature" />
+          <ProgressStep active={isInvestigationActive} icon={Search} title="Investigation" subtitle="LLM Processing" />
+          <ProgressStep active={isRecommendationActive} icon={Monitor} title="Recommendation" subtitle="Advisement" />
+          <ProgressStep active={isCompletedActive} icon={Check} title="Completed" subtitle="" />
         </div>
       </section>
 
@@ -325,7 +444,7 @@ export default function InvestigateDetail() {
           <div style={{ ...panelStyle, minHeight: 46, padding: '13px 22px', display: 'flex', alignItems: 'center', gap: 12 }}>
             <AlertTriangle size={16} color="#f4f6fb" />
             <span style={{ color: '#c9d0df', fontSize: 12 }}>Severity :</span>
-            <strong style={{ color: '#ffffff', fontSize: 13 }}>{severity}</strong>
+            <SeverityBadge severity={severity} />
           </div>
           <div style={{ ...panelStyle, minHeight: 46, padding: '13px 22px', display: 'flex', alignItems: 'center', gap: 12 }}>
             <Database size={16} color="#f4f6fb" />

@@ -15,7 +15,7 @@ const samplePayload = JSON.stringify(
               severity: 'High',
               host: 'endpoint-01',
               detected_time: new Date().toISOString(),
-            },
+            },  
           },
         ],
       },
@@ -24,6 +24,12 @@ const samplePayload = JSON.stringify(
   null,
   2
 )
+
+const styles = {
+  ':root': {
+    '--background': '#111111',
+  },
+};
 
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -48,7 +54,7 @@ const inputStyle = {
   border: '1px solid #263449',
   background: '#080d18',
   color: '#e5e7eb',
-  padding: '0 12px',
+  padding: '0 6px 0 10px',
   fontFamily: 'JetBrains Mono, monospace',
   fontSize: 12,
   outline: 'none',
@@ -212,9 +218,9 @@ export default function SendEdr() {
     <div style={{ minHeight: 'calc(100vh - 40px)', padding: 24, color: '#f8fafc' }}>
       <div style={{ marginBottom: 22 }}>
         <div style={{ color: '#64748b', fontFamily: 'JetBrains Mono, monospace', fontSize: 11, letterSpacing: 2, textTransform: 'uppercase' }}>
-          SEDR PUBLISHER
+          SEND PUBLISHER
         </div>
-        <h1 style={{ margin: '5px 0 0', fontSize: 24, fontWeight: 700 }}>Send EDR Logs</h1>
+        <h1 style={{ margin: '5px 0 0', fontSize: 24, fontWeight: 700 }}>Simulate Send Log to Agents</h1>
       </div>
 
       <section
@@ -225,14 +231,14 @@ export default function SendEdr() {
           alignItems: 'start',
         }}
       >
-        <div style={{ background: '#0f172a', border: '1px solid #1f2a44', borderRadius: 8, padding: 16 }}>
+        <div style={{  background: '#111111', border: '1px solid #1f2a44', borderRadius: 8, padding: 16 }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) 150px', gap: 10, marginBottom: 10 }}>
             <label style={{ display: 'grid', gap: 6 }}>
               <span style={{ color: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>ENDPOINT</span>
               <input value={endpoint} onChange={(event) => setEndpoint(event.target.value)} style={inputStyle} />
             </label>
             <label style={{ display: 'grid', gap: 6 }}>
-              <span style={{ color: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono, monospace' }}>DELAY SEC</span>
+              <span style={{ color: '#94a3b8', fontSize: 11, fontFamily: 'JetBrains Mono, monospace'}}>DELAY SEC</span>
               <input
                 type="number"
                 min="0"
@@ -272,7 +278,7 @@ export default function SendEdr() {
         </div>
 
         <div style={{ display: 'grid', gap: 14 }}>
-          <div style={{ background: '#0f172a', border: '1px solid #1f2a44', borderRadius: 8, padding: 16 }}>
+          <div style={{ background: '#111111', border: '1px solid #1f2a44', borderRadius: 8, padding: 16 }}>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 10, marginBottom: 14 }}>
               {[
                 ['NODES', nodes.length, '#38bdf8'],
@@ -322,8 +328,8 @@ export default function SendEdr() {
               </button>
             </div>
           </div>
-
-          <div style={{ background: '#0f172a', border: '1px solid #1f2a44', borderRadius: 8, overflow: 'hidden' }}>
+            {/* BackGround Pannel Send */}
+          <div style={{ background: '#0e0f0f', border: '1px solid #1f2a44', borderRadius: 8, overflow: 'hidden' }}>
             <div style={{ padding: '12px 14px', borderBottom: '1px solid #1f2a44', display: 'flex', alignItems: 'center', gap: 8 }}>
               <FileJson size={15} color="#93c5fd" />
               <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: '#cbd5e1' }}>PUBLISH RESULT</span>
