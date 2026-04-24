@@ -1,9 +1,9 @@
 import { useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { authenticate, isAuthenticated, loginSession } from '../../lib/auth'
-import wavesVideo from '../../White Waves - Background.mp4'
-import PearlguardLogo from '../../../src/PearlguardLogo.png'
-import Pearlguard from '../../../src/Pearlguard.png'
+import wavesVideo from '../../assets/video/White Waves - Background.mp4'
+import PearlguardLogo from '../../assets/image/PearlguardLogo.png'
+import Pearlguard from '../../assets/image/Pearlguard.png'
 
 export default function Login() {
   const [username, setUsername] = useState('')

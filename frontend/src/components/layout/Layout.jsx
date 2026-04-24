@@ -4,7 +4,7 @@ import {
   Bell,
   Bot,
   ExternalLink,
-  FileWarning,
+  Rotate3d,
   Home,
   LayoutDashboard,
   PanelLeftClose,
@@ -14,9 +14,9 @@ import {
   LogOut,
   CircleUserRound,
 } from 'lucide-react'
-import PearlguardLogo from '../../PearlguardLogo.png'
-import bgImg from '../../image 38.png'
-import bgImg_2 from '../../bg-img-3.png'
+import PearlguardLogo from '../../assets/image/PearlguardLogo.png'
+import bgImg from '../../assets/image/image 38.png'
+import bgImg_2 from '../../assets/image/bg-img-3.png'
 import { clearSession, getAuthenticatedUser } from '../../lib/auth'
 
 const NAV = [
@@ -25,9 +25,9 @@ const NAV = [
   { to: '/alerts', icon: Bot, label: 'Investigate' },
   // { to: '/investigate', icon: Search, label: 'Investigate' },
   // { to: '/agents', icon: Bot, label: 'Agents' },
-  // { to: '/incidents', icon: FileWarning, label: 'Incidents' },
+  // { to: '/incidents', icon: Rotate3d, label: 'Incidents' },
   { to: '/sedr', icon: Radio, label: 'Send Logs' },
-  { to: '/about-us', icon: FileWarning, label: 'About Us' },
+  { to: '/about-us', icon: Rotate3d, label: 'About Us' },
 ]
 
 export default function Layout() {
@@ -132,7 +132,7 @@ export default function Layout() {
                 lineHeight: 1,
               }}
             >
-              PEARL
+              PROBE
             </div>
           )}
         </div>
@@ -156,12 +156,12 @@ export default function Layout() {
                 fontWeight: 400,
                 color: isActive ? '#ffffff' : 'rgba(233, 236, 248, 0.76)',
                 background: isActive
-                  ? 'linear-gradient(100deg, rgba(77, 78, 145, 0.23), rgba(98, 56, 98, 0.28))'
+                  ? 'linear-gradient(100deg, rgba(4, 39, 196, 0.14), rgba(0, 255, 255, 0.28))'
                   : 'transparent',
                 border: isActive ? '1px solid rgba(184, 183, 255, 0.18)' : '1px solid transparent',
                 borderRadius: 8,
                 boxShadow: isActive
-                  ? 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 10px rgba(69, 36, 88, 0.32)'
+                  ? 'inset 0 1px 0 rgba(255,255,255,0.08), 0 2px 10px rgba(36, 78, 88, 0.32)'
                   : 'none',
                 backdropFilter: isActive ? 'blur(14px)' : 'none',
                 WebkitBackdropFilter: isActive ? 'blur(14px)' : 'none',
@@ -223,7 +223,7 @@ export default function Layout() {
                 padding:'8px 0' ,
                 // border: '1px solid rgba(224, 231, 255, 0.18)',
                 borderRadius: 8,
-                background: 'rgba(255,255,255,0.02)',
+                background: 'rgba(255, 255, 255, 0)',
                 color: '#f8fbff',
                 fontSize: 10,
                 letterSpacing: 4,
