@@ -33,6 +33,14 @@ function StatCard({ icon: Icon, label, value, color, sub }) {
 
 const normalizeStatus = (value) => String(value || '').toLowerCase()
 const normalizeSeverity = (value) => String(value || '').toLowerCase()
+const pad2 = (value) => String(value).padStart(2, '0')
+const toLocalDateKey = (value) => {
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+  return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
+}
+const toDayLabel = (date) => `${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
+const getAlertTrendTimestamp = (alert) => alert?.updated_at || alert?.detected_time || alert?.created_at || null
 const toDisplayDateTime = (value) => {
   if (!value) return '-'
   const parsed = new Date(value)
@@ -123,15 +131,16 @@ export default function Dashboard() {
     const buckets = new Map()
     for (let dayOffset = 6; dayOffset >= 0; dayOffset -= 1) {
       const date = new Date()
+      date.setHours(0, 0, 0, 0)
       date.setDate(date.getDate() - dayOffset)
-      const key = date.toISOString().slice(0, 10)
-      buckets.set(key, { time: key.slice(5), alerts: 0 })
+      const key = toLocalDateKey(date)
+      buckets.set(key, { time: toDayLabel(date), alerts: 0 })
     }
 
     for (const alert of alerts) {
-      const detected = alert?.detected_time ? new Date(alert.detected_time) : null
-      if (!detected || Number.isNaN(detected.getTime())) continue
-      const key = detected.toISOString().slice(0, 10)
+      const trendTimestamp = getAlertTrendTimestamp(alert)
+      if (!trendTimestamp) continue
+      const key = toLocalDateKey(trendTimestamp)
       if (!buckets.has(key)) continue
       const entry = buckets.get(key)
       entry.alerts += 1
@@ -171,7 +180,7 @@ export default function Dashboard() {
             display: 'flex',
             alignItems: 'center',
             gap: 6,
-            background: loading ? '#121826' : '#1f2937',
+            background: loading ? '#fffff1a' : '#fffff1a',
             border: '1px solid #374151',
             color: loading ? '#667085' : '#9ca3af',
             borderRadius: 6,
@@ -217,9 +226,9 @@ export default function Dashboard() {
               <XAxis type="number" tick={{ fill: '#6b7280', fontSize: 10 }} axisLine={false} tickLine={false} />
               <YAxis type="category" dataKey="name" tick={{ fill: '#9ca3af', fontSize: 11 }} axisLine={false} tickLine={false} width={55} />
               <Tooltip contentStyle={{ background: '#1f2937', border: 'none', borderRadius: 6, fontSize: 12 }} />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]}>
+              <Bar dataKey="value"  fill="#00d4ff" radius={[0, 4, 4, 0]}>
                 {severityData.map((entry) => (
-                  <Cell key={entry.name} fill={entry.fill} />
+                  <Cell key={entry.name} fill={entry.fill}  />
                 ))}
               </Bar>
             </BarChart>

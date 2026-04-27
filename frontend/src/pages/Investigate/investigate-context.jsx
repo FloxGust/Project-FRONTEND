@@ -7,7 +7,7 @@ import {
   Monitor,
   RefreshCw,
   Search,
-  SquareChevronLeft,
+  StepBack,
   TerminalSquare,
 } from 'lucide-react'
 
@@ -189,6 +189,23 @@ export default function InvestigateContext() {
   const title = alert?.alert_name || latestInvestigation.summary || 'Untitled Alert'
   const verdict = statusBadge(latestInvestigation.verdict || alert?.status)
   const source = pickFirst(alert?.source, latestContext.source, latestInvestigation.source)
+  const mitreTactic = pickFirst(
+    latestPrediction.main_tactic,
+    latestPrediction.tactic,
+    latestPrediction?.mitre?.tactic
+  )
+  const mitreTechnique = pickFirst(
+    latestPrediction.main_technique,
+    latestPrediction.technique,
+    latestPrediction?.mitre?.technique
+  )
+  const mitreSubTechnique = pickFirst(
+    latestPrediction.sub_technique,
+    latestPrediction.subTechnique,
+    latestPrediction?.mitre?.subTechnique,
+    latestPrediction.technique_id,
+    latestPrediction.mitre_id
+  )
 
   const handleRefresh = () => {
     if (!refreshTarget || loading) return
@@ -220,7 +237,7 @@ export default function InvestigateContext() {
           marginBottom: 24,
         }}
       >
-        <SquareChevronLeft
+        <StepBack
           size={18}
           color="#f5f7ff"
           style={{ cursor: 'pointer' }}
@@ -232,7 +249,7 @@ export default function InvestigateContext() {
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {/* <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip> */}
           {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
-          {isModelTypePrediction && <Chip tone="blue">LLM</Chip>}
+          {isModelTypePrediction && <Chip tone="blue">Type Agent</Chip>}
           <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}
@@ -323,11 +340,13 @@ export default function InvestigateContext() {
             MITRE ATT&CK
           </h2>
           <InfoBox>
-            <div>Tactic: {pickFirst(latestPrediction.main_tactic)}</div>
-            <div>Technique: {pickFirst(latestPrediction.main_technique)}</div>
-            <div>{pickFirst(latestPrediction.technique_id, latestPrediction.mitre_id, latestPrediction.sub_technique)}</div>
+            <div style={{ display: 'grid', gap: 9 }}>
+              <div><span style={{ color: '#7e7e7e' }}>Tactic: </span>{mitreTactic}</div>
+              <div><span style={{ color: '#7e7e7e' }}>Technique: </span>{mitreTechnique}</div>
+              <div><span style={{ color: '#7e7e7e' }}>Subtechnique: </span>{mitreSubTechnique}</div>
+            </div>
           </InfoBox>
-
+            
           <div style={{ height: 28 }} />
 
           <InfoBox>

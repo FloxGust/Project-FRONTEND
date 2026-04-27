@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight, RefreshCw, Search } from 'lucide-react'
 
 import { alertsApi } from '../../api'
-import { RGBAFormat } from 'three/src/constants.js'
 
 const normalizeSeverity = (value) => {
   const lower = String(value || '').toLowerCase()
@@ -24,6 +23,13 @@ const toDisplayDateTime = (value) => {
   return date.toLocaleString()
 }
 
+const toUnixMs = (value) => {
+  if (!value) return 0
+  const timestamp = new Date(value).getTime()
+  if (Number.isNaN(timestamp)) return 0
+  return timestamp
+}
+
 const extractSrcIp = (alert) => {
   const fromRaw = alert?.raw_log?.contexts?.src_ip
   if (Array.isArray(fromRaw)) return fromRaw.join(', ')
@@ -42,6 +48,7 @@ const normalizeAlert = (alert) => {
     severity,
     status,
     detected_time: alert?.detected_time || null,
+    updated_at: alert?.updated_at || null,
     trace_id: String(alert?.trace_id ?? '-'),
     src_ip: extractSrcIp(alert),
   }
@@ -156,6 +163,7 @@ export default function AlertQueue() {
 
   const filteredAlerts = useMemo(() => {
     const query = search.trim().toLowerCase()
+
     return alerts
       .filter((alert) => {
         if (filter === 'all') return true
@@ -163,6 +171,8 @@ export default function AlertQueue() {
       })
       .filter((alert) => {
         if (!query) return true
+        const detectedDisplay = toDisplayDateTime(alert.detected_time)
+        const updatedDisplay = toDisplayDateTime(alert.updated_at)
         return [
           alert.id,
           alert.external_alert_id,
@@ -170,11 +180,15 @@ export default function AlertQueue() {
           alert.source,
           alert.trace_id,
           alert.src_ip,
+          alert.detected_time,
+          alert.updated_at,
+          detectedDisplay,
+          updatedDisplay,
         ].some((value) => String(value || '').toLowerCase().includes(query))
       })
       .sort((a, b) => {
-        const aTime = a.detected_time ? new Date(a.detected_time).getTime() : 0
-        const bTime = b.detected_time ? new Date(b.detected_time).getTime() : 0
+        const aTime = toUnixMs(a.updated_at) || toUnixMs(a.detected_time)
+        const bTime = toUnixMs(b.updated_at) || toUnixMs(b.detected_time)
         return bTime - aTime
       })
   }, [alerts, filter, search])
@@ -228,7 +242,7 @@ export default function AlertQueue() {
           <input
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            placeholder="Search id, external id, trace id, source, ip..."
+            placeholder="Search id, source, ip, date/time..."
             style={{
               background: 'none',
               border: 'none',

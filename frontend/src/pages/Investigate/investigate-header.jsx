@@ -56,8 +56,8 @@ export default function InvestigateHeader() {
     || bundle?.recommendations?.[0]?.status
   )
 
-  const passContext = predictionStatus !== 'RECEIVED'
-  const passCompleted = recommendationStatus !== 'RECEIVED'
+  const passContext = predictionStatus !== 'PENDING'
+  const passCompleted = recommendationStatus !== 'PENDING'
 
   const inactiveTabs = useMemo(
     () => ({

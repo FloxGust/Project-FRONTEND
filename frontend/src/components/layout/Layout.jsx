@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import {
   Bell,
   Bot,
-  ExternalLink,
+  Grid2x2,
+  Box,
   Rotate3d,
   Home,
   LayoutDashboard,
@@ -12,7 +13,6 @@ import {
   Radio,
   Search,
   LogOut,
-  CircleUserRound,
 } from 'lucide-react'
 import PearlguardLogo from '../../assets/image/PearlguardLogo.png'
 import bgImg from '../../assets/image/image 38.png'
@@ -178,7 +178,7 @@ export default function Layout() {
          
         <div
           style={{
-            padding: sidebarVisible ? '0 30px 24px' : '0 0 24px',
+            padding: sidebarVisible ? '0 16px 24px' : '0 0 24px',
             color: '#f5f7ff',
             fontSize: 10,
             width: '100%',
@@ -187,54 +187,47 @@ export default function Layout() {
           <div
             style={{
               display: 'flex',
-              alignItems: 'flex-start',
-              justifyContent: 'start',
-              flexDirection: 'column',
-              marginBottom: 62,
+              alignItems: 'center',
+              justifyContent:'center',
+              gap: 8,
+              marginBottom: 24,
             }}
           >
             {sidebarVisible && username && (
               <div
                 style={{
-                  marginBottom: 12,
-                  // color: "rgba(240, 244, 255, 0.72)",
-                  letterSpacing: 0.5,
+                  color: 'rgba(246, 250, 255, 0.92)',
+                  lineHeight: 1,
+                  letterSpacing: 0.2,
                   fontSize: 14,
+                  whiteSpace: 'nowrap',
                 }}
               >
-                <div
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 25, // ระยะห่าง icon กับ text
-                  }}
-                >
-                  <CircleUserRound size={16} strokeWidth={1.75} />
-                  <span>{username}</span>
-                </div>
+                <span>{username}</span>
               </div>
             )}
             <button
               type="button"
               onClick={handleLogout}
               style={{
-                width: '100%',
-                marginTop: 1,
-                padding:'8px 0' ,
-                // border: '1px solid rgba(224, 231, 255, 0.18)',
+                width: sidebarVisible ? 'auto' : '100%',
+                padding: sidebarVisible ? '8px 11px' : '0px 0',
                 borderRadius: 8,
-                background: 'rgba(255, 255, 255, 0)',
+                border: sidebarVisible ? '1px solid rgba(224, 231, 255, 0.12)' : 'none',
+                background: 'rgba(24, 28, 42, 0.38)',
                 color: '#f8fbff',
                 fontSize: 10,
-                letterSpacing: 4,
+                letterSpacing: 0.3,
                 display: 'flex',
                 alignItems: 'center',
-                // justifyContent: 'start',
+                justifyContent: 'center',
+                gap: 8,
                 cursor: 'pointer',
+                whiteSpace: 'nowrap',
             }}
             >
-              {sidebarVisible && <LogOut size={13} strokeWidth={1.75} />}
-              {sidebarVisible && <span style={{margin:'0 0 0 30px'}}>LOGOUT</span>}
+              {sidebarVisible && <span>LOGOUT</span>}
+              {sidebarVisible && <LogOut size={13} strokeWidth={1.85} />}
             </button>
           </div>
           {sidebarVisible && (
@@ -272,8 +265,8 @@ export default function Layout() {
               cursor: 'pointer',
             }}
           >
-            {sidebarVisible ? <span style={{ color: '#f5f7ff52' }}>CLOSE</span> : <ExternalLink size={13} strokeWidth={1.75} />}
-            {sidebarVisible && <ExternalLink size={13} strokeWidth={1.75} />}
+            {sidebarVisible ? <span style={{ color: '#f5f7ff52' }}>CLOSE</span> : <Box size={13} strokeWidth={1.75} />}
+            {sidebarVisible && <Grid2x2 size={13} strokeWidth={1.75} />}
           </button>
         </div>
       </aside>
@@ -337,3 +330,4 @@ export default function Layout() {
     </div>
   )
 }
+

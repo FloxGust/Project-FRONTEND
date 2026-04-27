@@ -9,7 +9,7 @@ import {
   Database,
   Monitor,
   RefreshCw,
-  SquareChevronLeft,
+  StepBack,
   Search,
   TerminalSquare,
 } from 'lucide-react'
@@ -252,10 +252,10 @@ export default function InvestigateDetail() {
   }, [bundle, latestPrediction, predictions])
 
   const passType = typeStatus === 'RECEIVED'
-  const passContext = contextStatus === 'RECEIVED'
-  const passInvestigation = investigationStatus === 'RECEIVED'
-  const passRecommendation = recommendationStatus === 'RECEIVED'
-  const passCompleted = recommendationStatus === 'RECEIVED'
+  const passContext = contextStatus === 'PENDING'
+  const passInvestigation = investigationStatus === 'PENDING'
+  const passRecommendation = recommendationStatus === 'PENDING'
+  const passCompleted = recommendationStatus === 'PENDING'
 
   // Gate each next step by the previous step so progress is strictly sequential.
   const isTypeActive = passType
@@ -303,7 +303,7 @@ export default function InvestigateDetail() {
           marginBottom: 16,
         }}
       >
-        <SquareChevronLeft
+        <StepBack
           size={18}
           color="#f5f7ff"
           style={{ cursor: 'pointer' }}
@@ -315,7 +315,7 @@ export default function InvestigateDetail() {
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {/* <Chip tone="red">{badge.label === 'Malicious' ? 'o Malicious' : badge.label}</Chip> */}
           {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
-          {isModelTypePrediction && <Chip tone="blue">LLM</Chip>}
+          {isModelTypePrediction && <Chip tone="blue">Type Agent</Chip>}
            <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}

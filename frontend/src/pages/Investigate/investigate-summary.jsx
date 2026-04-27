@@ -7,7 +7,7 @@ import {
   RefreshCw,
   Search,
   Sparkles,
-  SquareChevronLeft,
+  StepBack,
 } from 'lucide-react'
 
 import { alertsApi } from '../../api'
@@ -328,7 +328,7 @@ export default function InvestigateSummary() {
           marginBottom: 24,
         }}
       >
-        <SquareChevronLeft
+        <StepBack
           size={18}
           color="#f5f7ff"
           style={{ cursor: 'pointer' }}
@@ -340,7 +340,7 @@ export default function InvestigateSummary() {
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {/* <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip> */}
           {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
-          {isModelTypePrediction && <Chip tone="blue">LLM</Chip>}
+          {isModelTypePrediction && <Chip tone="blue">Type Agent</Chip>}
           <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}

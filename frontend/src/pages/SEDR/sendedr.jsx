@@ -25,12 +25,6 @@ const samplePayload = JSON.stringify(
   2
 )
 
-const styles = {
-  ':root': {
-    '--background': '#111111',
-  },
-};
-
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 const buttonBase = {

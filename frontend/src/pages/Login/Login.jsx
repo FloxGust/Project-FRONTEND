@@ -4,6 +4,7 @@ import { authenticate, isAuthenticated, loginSession } from '../../lib/auth'
 import wavesVideo from '../../assets/video/White Waves - Background.mp4'
 import PearlguardLogo from '../../assets/image/PearlguardLogo.png'
 import Pearlguard from '../../assets/image/Pearlguard.png'
+import Probe from '../../assets/image/Probe.png'
 
 export default function Login() {
   const [username, setUsername] = useState('')
@@ -81,10 +82,15 @@ export default function Login() {
           style={{width: 420, height: 'auto', marginRight: -100 }}
         />
         <img
+          src={Probe}
+          alt="Probe"
+          style={{width: 720, height: 'auto', marginRight: -200,marginLeft: 60 }}
+        />
+        {/* <img
           src={Pearlguard}
           alt="Pearlguard"
           style={{width: 720, height: 'auto', marginRight: -200 }}
-        />
+        /> */}
         {/* <div>
           <p style={{ fontSize: '1.5rem',fontFamily: "Damion", color: 'rgba(235, 239, 255, 0.72)' }}>
             Welcome To
