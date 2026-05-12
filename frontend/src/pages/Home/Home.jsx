@@ -36,7 +36,7 @@ const CONNECTION_GROUPS = [
   },
 ]
 
-const TRUSTED = ['CROWDSTRIKE', 'SPLUNK', 'PALO ALTO', 'CLOUDFLARE', 'MICROSOFT', 'AWS']
+const TRUSTED = ['', '', '', '', '', '']
 
 const FEATURES = [
   {
@@ -652,9 +652,9 @@ export default function Home() {
             Security Intelligence Engine
           </div>
           <h1 className="home-headline">
-            Command Your SOC
+            Probe Scrutiny for Next-Gen
             <br />
-            With <em>Autonomous Precision</em>
+            With <em>Agentic AI</em>
           </h1>
           <p className="home-sub">
             From first signal to final containment, PearlGuard orchestrates AI analysts, context,
@@ -712,7 +712,7 @@ export default function Home() {
         </section>
 
         <section className="home-trust">
-          <div className="home-trust-note">TRUSTED IN GLOBAL SECOPS STACKS</div>
+          <div className="home-trust-note">.....</div>
           <div className="home-trust-logos">
             {TRUSTED.map((name) => (
               <div key={name} className="home-logo">
@@ -722,9 +722,9 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="home-features">
+        {/* <section className="home-features">
           <h2 className="home-title">
-            Designed To Outrun <em>Modern Attacks</em>
+            ...... <em>.......</em>
           </h2>
 
           <div className="home-feature-grid">
@@ -757,7 +757,7 @@ export default function Home() {
               <p>Execute playbooks and notify the right team instantly.</p>
             </article>
           </div>
-        </section>
+        </section> */}
       </div>
     </div>
   )

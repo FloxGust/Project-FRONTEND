@@ -46,6 +46,13 @@ const statusBadge = (status) => {
 
 const pickFirst = (...values) => values.find((value) => value !== null && value !== undefined && value !== '') || '-'
 
+const normalizeConfidence = (value) => {
+  if (value === null || value === undefined || value === '') return '-'
+  const parsed = Number(value)
+  if (Number.isNaN(parsed)) return String(value)
+  return parsed <= 1 ? `${Math.round(parsed * 100)} %` : `${Math.round(parsed)} %`
+}
+
 const Chip = ({ children, tone = 'blue' }) => {
   const tones = {
     red: { color: '#ff4058', border: 'rgba(255, 64, 88, 0.7)', background: 'rgba(255, 64, 88, 0.1)' },
@@ -162,9 +169,8 @@ export default function InvestigateContext() {
 
     const directSources = [
       bundle?.result_type_prediction?.source,
-      bundle?.result_type_prediction?.Source,
-      bundle?.resultTypePrediction?.source,
-      bundle?.resultTypePrediction?.Source,
+      bundle?.result_type_prediction?.confidence,
+
       latestPrediction?.source,
       latestPrediction?.Source,
     ]
@@ -206,6 +212,8 @@ export default function InvestigateContext() {
     latestPrediction.technique_id,
     latestPrediction.mitre_id
   )
+  const confidence = latestPrediction?.confidence
+  const confidenceLabel = normalizeConfidence(confidence)
 
   const handleRefresh = () => {
     if (!refreshTarget || loading) return
@@ -348,6 +356,15 @@ export default function InvestigateContext() {
           </InfoBox>
             
           <div style={{ height: 28 }} />
+
+          <InfoBox>
+            <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
+              <span style={{ color: '#ffffff', fontSize: 10 }}>Confidence</span>
+              <span style={{ color: '#ff4058', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 900 }}>{confidenceLabel}</span>
+            </div>
+          </InfoBox>
+
+          <div style={{ height: 10 }} />
 
           <InfoBox>
             <div>Log source : {source}</div>
