@@ -29,6 +29,7 @@ export default function Login() {
     }
 
     loginSession(foundUser.username)
+    // window.sessionStorage.setItem('home_skeleton_after_login', '1')
     navigate(from, { replace: true })
   }
 

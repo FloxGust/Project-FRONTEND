@@ -17,17 +17,17 @@ import {
 import PearlguardLogo from '../../assets/image/PearlguardLogo.png'
 import bgImg from '../../assets/image/image 38.png'
 import bgImg_2 from '../../assets/image/bg-img-3.png'
-import { clearSession, getAuthenticatedUser } from '../../lib/auth'
+import { clearSession, getAuthenticatedUser, getAuthenticatedUserRole } from '../../lib/auth'
 
-const NAV = [
-  { to: '/home', icon: Home, label: 'Home' },
-  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/alerts', icon: Bot, label: 'Investigate' },
+const ALL_NAV = [
+  { to: '/home', icon: Home, label: 'Home', roles: ['admin', 'user'] },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard', roles: ['admin', 'user'] },
+  { to: '/alerts', icon: Bot, label: 'Investigate', roles: ['admin', 'user'] },
   // { to: '/investigate', icon: Search, label: 'Investigate' },
   // { to: '/agents', icon: Bot, label: 'Agents' },
   // { to: '/incidents', icon: Rotate3d, label: 'Incidents' },
-  { to: '/sedr', icon: Radio, label: 'Send Logs' },
-  { to: '/about-us', icon: Rotate3d, label: 'About Us' },
+  { to: '/sedr', icon: Radio, label: 'Send Logs', roles: ['admin'] },
+  { to: '/about-us', icon: Rotate3d, label: 'About Us', roles: ['admin', 'user'] },
 ]
 
 export default function Layout() {
@@ -39,6 +39,8 @@ export default function Layout() {
   const [hover, setHover] = useState(false)
   const [now, setNow] = useState(() => new Date())
   const username = getAuthenticatedUser()
+  const role = getAuthenticatedUserRole()
+  const NAV = ALL_NAV.filter(({ roles }) => roles.includes(role))
 
   useEffect(() => {
     setSidebarVisible(!isHome)

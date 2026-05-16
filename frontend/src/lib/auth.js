@@ -2,10 +2,19 @@ const AUTH_COOKIE_NAME = 'pearl_auth'
 const AUTH_USER_COOKIE_NAME = 'pearl_user'
 const AUTH_COOKIE_MAX_AGE_SECONDS = 60 * 60 * 8 // 8 hours
 
-export const users = [{ username: 'PearlAdmin', password: 'Axc123' }]
+export const users = [
+  { username: 'PearlAdmin', password: 'Axc123', role: 'admin' },
+  { username: 'User1', password: 'User123', role: 'user' },
+]
 
 export function authenticate(username, password) {
   return users.find((user) => user.username === username && user.password === password) || null
+}
+
+export function getAuthenticatedUserRole() {
+  const username = getAuthenticatedUser()
+  const user = users.find((u) => u.username === username)
+  return user?.role ?? null
 }
 
 function setCookie(name, value, maxAgeSeconds) {

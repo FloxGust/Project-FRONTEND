@@ -60,12 +60,28 @@ export default function Home() {
   const navigate = useNavigate()
   const [statusMap, setStatusMap] = useState({})
   const [isRefreshing, setIsRefreshing] = useState(false)
+  // const [showLoginSkeleton, setShowLoginSkeleton] = useState(false)
   const refreshStatusesRef = useRef(async () => {})
 
   const flattenedEndpoints = useMemo(
     () => CONNECTION_GROUPS.flatMap((group) => group.endpoints),
     []
   )
+
+  // useEffect(() => {
+  //   const shouldShowSkeleton = window.sessionStorage.getItem('home_skeleton_after_login') === '1'
+  //   if (!shouldShowSkeleton) return undefined
+
+  //   window.sessionStorage.removeItem('home_skeleton_after_login')
+  //   setShowLoginSkeleton(true)
+  //   const timerId = window.setTimeout(() => {
+  //     setShowLoginSkeleton(false)
+  //   }, 20)
+
+  //   return () => {
+  //     window.clearTimeout(timerId)
+  //   }
+  // }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -157,6 +173,37 @@ export default function Home() {
       window.clearInterval(timer)
     }
   }, [flattenedEndpoints])
+
+  // if (showLoginSkeleton) {
+  //   return (
+  //     <div
+  //       style={{
+  //         minHeight: '100vh',
+  //         borderRadius: 30,
+  //         border: '1px solid rgba(149, 176, 255, 0.2)',
+  //         background: 'linear-gradient(180deg, #040716 0%, #030513 46%, #02030f 100%)',
+  //         padding: '34px 38px 42px',
+  //         display: 'grid',
+  //         gap: 20,
+  //       }}
+  //     >
+  //       <style>{`
+  //         @keyframes home-skeleton-pulse {
+  //           0% { opacity: 0.45; }
+  //           50% { opacity: 0.85; }
+  //           100% { opacity: 0.45; }
+  //         }
+  //       `}</style>
+  //       <div style={{ height: 60, borderRadius: 18, background: 'rgba(120, 150, 210, 0.18)', animation: 'home-skeleton-pulse 1.2s ease-in-out infinite' }} />
+  //       <div style={{ height: 260, borderRadius: 28, background: 'rgba(120, 150, 210, 0.14)', animation: 'home-skeleton-pulse 1.2s ease-in-out infinite' }} />
+  //       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 16 }}>
+  //         <div style={{ height: 150, borderRadius: 20, background: 'rgba(120, 150, 210, 0.12)', animation: 'home-skeleton-pulse 1.2s ease-in-out infinite' }} />
+  //         <div style={{ height: 150, borderRadius: 20, background: 'rgba(120, 150, 210, 0.12)', animation: 'home-skeleton-pulse 1.2s ease-in-out infinite' }} />
+  //         <div style={{ height: 150, borderRadius: 20, background: 'rgba(120, 150, 210, 0.12)', animation: 'home-skeleton-pulse 1.2s ease-in-out infinite' }} />
+  //       </div>
+  //     </div>
+  //   )
+  // }
 
   return (
     <div className="home-shell">
