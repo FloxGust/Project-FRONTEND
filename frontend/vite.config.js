@@ -7,6 +7,7 @@ export default defineConfig(({ mode }) => {
   const hmrPort = Number(env.VITE_HMR_PORT || 5173)
   const hmrClientPort = Number(env.VITE_HMR_CLIENT_PORT || hmrPort)
   const hmrProtocol = env.VITE_HMR_PROTOCOL || 'ws'
+  const hmrPath = env.VITE_HMR_PATH || '/vite-hmr'
   const usePublicDomain = String(env.VITE_PUBLIC_DOMAIN || 'true').toLowerCase() === 'true'
   const dbProxyTarget = usePublicDomain
     ? env.VITE_DB_PUBLIC_PROXY_TARGET || 'https://db.paiac.store'
@@ -21,18 +22,27 @@ export default defineConfig(({ mode }) => {
     server: {
       host: '0.0.0.0',
       port: 5173,
+      strictPort: true,
       historyApiFallback: true,
       watch: {
         usePolling: true,
-        interval: 10,
-        binaryInterval: 600000,
+        interval: 30000,
+        // binaryInterval: 600000,
+        ignored: [
+        '**/node_modules/**',
+        '**/.git/**',
+        '**/dist/**',
+        '**/.vite/**',
+      ]
       },
       hmr: hmrHost
         ? {
             host: hmrHost,
+            // host: 'localhost', //'localhost',
             port: hmrPort,
             clientPort: hmrClientPort,
             protocol: hmrProtocol,
+            path: hmrPath,
           }
         : undefined,
       proxy: {

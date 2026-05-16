@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle, FileJson, Loader, Play, Radio, Send, Square, XCircle } from 'lucide-react'
 
 const DEFAULT_ENDPOINT = import.meta.env.VITE_SEDR_PUBLISH_URL || '/sedr-publish/api/publish-js'
@@ -25,7 +25,27 @@ const samplePayload = JSON.stringify(
   2
 )
 
-const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const sleep = (ms, signal) =>
+  new Promise((resolve, reject) => {
+    if (signal?.aborted) {
+      reject(new DOMException('Aborted', 'AbortError'))
+      return
+    }
+
+    const timeoutId = setTimeout(() => {
+      cleanup()
+      resolve()
+    }, ms)
+
+    const onAbort = () => {
+      clearTimeout(timeoutId)
+      cleanup()
+      reject(new DOMException('Aborted', 'AbortError'))
+    }
+
+    const cleanup = () => signal?.removeEventListener('abort', onAbort)
+    signal?.addEventListener('abort', onAbort)
+  })
 
 const buttonBase = {
   height: 38,
@@ -100,13 +120,25 @@ export default function SendEdr() {
   const [results, setResults] = useState([])
   const [sending, setSending] = useState(false)
   const stopRef = useRef(false)
+  const mountedRef = useRef(true)
+  const activeControllerRef = useRef(null)
 
   const parsed = useMemo(() => parseLogs(jsonText), [jsonText])
   const nodes = parsed.nodes
   const sentCount = results.filter((row) => row.status === 'success').length
   const failedCount = results.filter((row) => row.status === 'failed').length
 
-  const publishNode = async (node, index, total) => {
+  useEffect(() => {
+    mountedRef.current = true
+
+    return () => {
+      mountedRef.current = false
+      stopRef.current = true
+      activeControllerRef.current?.abort()
+    }
+  }, [])
+
+  const publishNode = async (node, index, total, signal) => {
     const requestId = `${Date.now()}-${index}-${Math.random().toString(16).slice(2)}`
     const payload = {
       subject,
@@ -129,6 +161,7 @@ export default function SendEdr() {
 
     try {
       const response = await fetch(endpoint, {
+        signal,
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -140,6 +173,8 @@ export default function SendEdr() {
       } catch {
         responseText = text || response.statusText
       }
+
+      if (!mountedRef.current) return
 
       setResults((rows) =>
         rows.map((row) =>
@@ -154,6 +189,8 @@ export default function SendEdr() {
         )
       )
     } catch (error) {
+      if (error?.name === 'AbortError' || !mountedRef.current) return
+
       setResults((rows) =>
         rows.map((row) =>
           row.id === requestId
@@ -188,23 +225,52 @@ export default function SendEdr() {
       return
     }
 
+    activeControllerRef.current?.abort()
+    const controller = new AbortController()
+    activeControllerRef.current = controller
+
     const queue = mode === 'one' ? parsedNodes.slice(0, 1) : parsedNodes
     stopRef.current = false
     setSending(true)
 
-    for (let index = 0; index < queue.length; index += 1) {
-      if (stopRef.current) break
-      await publishNode(queue[index], index + 1, queue.length)
-      if (index < queue.length - 1 && !stopRef.current) {
-        await sleep(Math.max(0, Number(delaySeconds) || 0) * 1000)
+    try {
+      for (let index = 0; index < queue.length; index += 1) {
+        if (stopRef.current || controller.signal.aborted) break
+        await publishNode(queue[index], index + 1, queue.length, controller.signal)
+
+        if (index < queue.length - 1 && !stopRef.current && !controller.signal.aborted) {
+          await sleep(Math.max(0, Number(delaySeconds) || 0) * 1000, controller.signal)
+        }
+      }
+    } catch (error) {
+      if (error?.name !== 'AbortError') {
+        setResults((rows) => [
+          {
+            id: `${Date.now()}-send-error`,
+            index: 0,
+            total: queue.length,
+            incidentId: '-',
+            status: 'failed',
+            statusCode: 'ERR',
+            response: error.message || 'Send loop failed',
+            time: new Date().toLocaleTimeString(),
+          },
+          ...rows,
+        ])
+      }
+    } finally {
+      if (activeControllerRef.current === controller) {
+        activeControllerRef.current = null
+      }
+      if (mountedRef.current) {
+        setSending(false)
       }
     }
-
-    setSending(false)
   }
 
   const stopSending = () => {
     stopRef.current = true
+    activeControllerRef.current?.abort()
     setSending(false)
   }
 

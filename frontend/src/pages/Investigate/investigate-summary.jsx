@@ -475,7 +475,7 @@ export default function InvestigateSummary() {
             </InfoBox>
             <div style={{ height: 10 }} />
             <InfoBox>
-              <div style={{ display: 'flex', gap: 8, alignItems: 'baseline', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <span style={{ color: '#99a3b8', fontSize: 10 }}>Confidence</span>
                 <span style={{ color: '#ff4058', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 900 }}>{confidenceLabel}</span>
               </div>
