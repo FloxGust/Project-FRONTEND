@@ -85,14 +85,16 @@ const Chip = ({ children, tone = 'blue' }) => {
     red: { color: '#ff4058', border: 'rgba(255, 64, 88, 0.7)', background: 'rgba(255, 64, 88, 0.1)' },
     yellow: { color: '#f4d247', border: 'rgba(244, 210, 71, 0.7)', background: 'rgba(244, 210, 71, 0.1)' },
     blue: { color: '#5f87ff', border: 'rgba(95, 135, 255, 0.65)', background: 'rgba(95, 135, 255, 0.12)' },
+    green: { color: '#22c55e', border: 'rgba(34, 197, 94, 0.7)', background: 'rgba(34, 197, 94, 0.12)' },
   }
-  const theme = tones[tone]
+  const theme = tones[tone] || tones.blue
   
   return (
     <span
     style={{
       minWidth: 78,
         height: 20,
+        padding: '2px 8px',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -315,7 +317,7 @@ export default function InvestigateDetail() {
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {/* <Chip tone="red">{badge.label === 'Malicious' ? 'o Malicious' : badge.label}</Chip> */}
           {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
-          {isModelTypePrediction && <Chip tone="blue">Type Agent</Chip>}
+          {isModelTypePrediction ? (<Chip tone="blue">Type Agent</Chip>) : (<Chip tone="green">Existing MITRE</Chip>)}
            <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}

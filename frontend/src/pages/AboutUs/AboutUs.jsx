@@ -146,9 +146,9 @@ export default function AboutUs() {
               <div className="about-kicker">[ PROBE SCURUTINY ]</div>
               <h1 className="about-title">Meet<span className="highlight"> OUR TEAM</span></h1>
             </div>
-            <div className="about-desc">
+            {/* <div className="about-desc">
               Our AI-driven automation eliminates busywork, streamlines your operations, and helps your business grow, without extra effort.
-            </div>
+            </div> */}
           </div>
           <div className="about-grid" style={{color:'#ffffff'}}>
             {TEAM_MEMBERS.map((member) => (

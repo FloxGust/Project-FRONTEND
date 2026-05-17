@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
       historyApiFallback: true,
       watch: {
         usePolling: true,
-        interval: 30000,
+        interval: 300,
         // binaryInterval: 600000,
         ignored: [
         '**/node_modules/**',

@@ -288,7 +288,7 @@ export default function UserAlertQueue() {
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: '1px solid #1f2937' }}>
-              {['Severity', 'ID', 'External ID', 'Alert Name', 'Source', 'Detected', 'Trace ID', 'Source IP', ''].map((header) => (
+              {['Severity', 'ID', 'Alert ID', 'Alert Name', 'Source', 'Detected', 'Trace ID', 'Source IP', ''].map((header) => (
                 <th
                   key={header}
                   style={{

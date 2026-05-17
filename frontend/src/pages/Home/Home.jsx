@@ -704,8 +704,7 @@ export default function Home() {
             With <em>Agentic AI</em>
           </h1>
           <p className="home-sub">
-            From first signal to final containment, PearlGuard orchestrates AI analysts, context,
-            and response actions in one cinematic control layer.
+            From the first alert to rapid response, Probe Scrutiny empowers AI-driven detection, investigation, and automated defense—all in a unified security platform.
           </p>
 
           <div className="home-cta">

@@ -35,17 +35,61 @@ const statusText = (value) => String(value || 'in process').replace(/_/g, ' ')
 const statusBadge = (status) => {
   const normalized = String(status || '').toLowerCase()
   if (normalized.includes('malicious') || normalized.includes('critical')) return 'Malicious'
+  if (normalized.includes('falsepositive') || normalized.includes('false_positive') || normalized.includes('false positive')) return 'False Positive'
   if (normalized.includes('closed') || normalized.includes('complete')) return 'Completed'
   if (normalized.includes('benign')) return 'Benign'
   if (normalized.includes('suspicious')) return 'Suspicious'
   return 'In Process'
 }
 
+const verdictTheme = (verdict) => {
+  const normalized = String(verdict || '').toLowerCase()
+  if (normalized === 'malicious') return { tone: 'red', label: 'Malicious' }
+  if (normalized === 'suspicious') return { tone: 'yellow', label: 'Suspicious' }
+  if (normalized === 'benign') return { tone: 'green', label: 'Benign' }
+  if (normalized === 'false positive') return { tone: 'gray', label: 'False Positive' }
+  if (normalized === 'completed') return { tone: 'blue', label: 'Completed' }
+  return { tone: 'blue', label: verdict || 'In Process' }
+}
+
+const parseConfidencePercent = (value) => {
+  if (value === null || value === undefined || value === '') return null
+  if (typeof value === 'number') {
+    if (Number.isNaN(value)) return null
+    return value <= 1 ? value * 100 : value
+  }
+
+  const raw = String(value).trim()
+  if (!raw) return null
+
+  const numeric = Number(raw.replace('%', '').trim())
+  if (Number.isNaN(numeric)) return null
+  return numeric <= 1 ? numeric * 100 : numeric
+}
+
 const normalizeConfidence = (value) => {
-  if (value === null || value === undefined || value === '') return '-'
-  const parsed = Number(value)
-  if (Number.isNaN(parsed)) return String(value)
-  return parsed <= 1 ? `${Math.round(parsed * 100)} %` : `${Math.round(parsed)} %`
+  const normalized = String(value || '').trim().toLowerCase()
+  if (normalized === 'high' || normalized === 'medium' || normalized === 'med' || normalized === 'low') {
+    if (normalized === 'med') return 'Medium'
+    return normalized.charAt(0).toUpperCase() + normalized.slice(1)
+  }
+
+  const percent = parseConfidencePercent(value)
+  if (percent === null) return value === null || value === undefined || value === '' ? '-' : String(value)
+  return `${Math.round(percent)} %`
+}
+
+const confidenceColor = (value) => {
+  const normalized = String(value || '').trim().toLowerCase()
+  if (normalized === 'high') return '#ff4058'
+  if (normalized === 'medium' || normalized === 'med') return '#f4d247'
+  if (normalized === 'low') return '#22c55e'
+
+  const percent = parseConfidencePercent(value)
+  if (percent === null) return '#9ca3af'
+  if (percent >= 80) return '#ff4058'
+  if (percent >= 50) return '#f4d247'
+  return '#22c55e'
 }
 
 const Chip = ({ children, tone = 'blue' }) => {
@@ -53,6 +97,8 @@ const Chip = ({ children, tone = 'blue' }) => {
     red: { color: '#ff4058', border: 'rgba(255, 64, 88, 0.7)', background: 'rgba(255, 64, 88, 0.1)' },
     yellow: { color: '#f4d247', border: 'rgba(244, 210, 71, 0.7)', background: 'rgba(244, 210, 71, 0.1)' },
     blue: { color: '#5f87ff', border: 'rgba(95, 135, 255, 0.65)', background: 'rgba(95, 135, 255, 0.12)' },
+    green: { color: '#22c55e', border: 'rgba(34, 197, 94, 0.7)', background: 'rgba(34, 197, 94, 0.12)' },
+    gray: { color: '#d1d5db', border: 'rgba(156, 163, 175, 0.72)', background: 'rgba(156, 163, 175, 0.12)' },
   }
   const theme = tones[tone]
 
@@ -61,6 +107,7 @@ const Chip = ({ children, tone = 'blue' }) => {
       style={{
         minWidth: 78,
         height: 20,
+        padding: '2px 8px',
         display: 'inline-flex',
         alignItems: 'center',
         justifyContent: 'center',
@@ -275,8 +322,10 @@ export default function InvestigateSummary() {
 
   const title = alert?.alert_name || latestInvestigation.summary || 'Untitled Alert'
   const verdict = statusBadge(latestInvestigation.verdict || alert?.status)
+  const verdictDisplay = verdictTheme(verdict)
   const confidence = pickFirst(latestInvestigation.confidence, latestPrediction.confidence)
   const confidenceLabel = normalizeConfidence(confidence)
+  const confidenceTextColor = confidenceColor(confidence)
   const source = pickFirst(alert?.source, latestContext.source, latestInvestigation.source)
   const analysisSummary = pickFirst(
     latestInvestigation.summary,
@@ -295,6 +344,23 @@ export default function InvestigateSummary() {
     latestRecommendation.content,
     latestRecommendation.summary,
     'Recommendation is waiting for additional investigation output.'
+  )
+  const mitreTactic = pickFirst(
+    latestPrediction.main_tactic,
+    latestPrediction.tactic,
+    latestPrediction?.mitre?.tactic
+  )
+  const mitreTechnique = pickFirst(
+    latestPrediction.main_technique,
+    latestPrediction.technique,
+    latestPrediction?.mitre?.technique
+  )
+  const mitreSubTechnique = pickFirst(
+    latestPrediction.sub_technique,
+    latestPrediction.subTechnique,
+    latestPrediction?.mitre?.subTechnique,
+    latestPrediction.technique_id,
+    latestPrediction.mitre_id
   )
   const mitreRows = predictions.length > 0 ? predictions.slice(0, 3) : [latestPrediction, latestPrediction, latestPrediction]
 
@@ -340,8 +406,8 @@ export default function InvestigateSummary() {
         <div style={{ display: 'flex', gap: 16, alignItems: 'center', flexWrap: 'wrap', justifyContent: 'flex-end' }}>
           {/* <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip> */}
           {/* <Chip tone="yellow">{statusText(alert?.status)}</Chip> */}
-          {isModelTypePrediction && <Chip tone="blue">Type Agent</Chip>}
-          <button
+           {isModelTypePrediction ? (<Chip tone="blue">Type Agent</Chip>) : (<Chip tone="green">Existing MITRE</Chip>)}
+           <button
             onClick={handleRefresh}
             disabled={loading || !refreshTarget}
             style={{
@@ -468,16 +534,16 @@ export default function InvestigateSummary() {
             </h2>
             <InfoBox>
               <div style={{ display: 'grid', gap: 9 }}>
-                <div><span style={{ color: '#7e7e7e' }}>Tactic: </span>{logClassification?.mitre?.tactic || '-'}</div>
-                <div><span style={{ color: '#7e7e7e' }}>Technique: </span>{logClassification?.mitre?.technique || '-'}</div>
-                <div><span style={{ color: '#7e7e7e' }}>Subtechnique: </span>{logClassification?.mitre?.subTechnique || '-'}</div>
+                <div><span style={{ color: '#7e7e7e' }}>Tactic: </span>{mitreTactic}</div>
+                <div><span style={{ color: '#7e7e7e' }}>Technique: </span>{mitreTechnique}</div>
+                <div><span style={{ color: '#7e7e7e' }}>Subtechnique: </span>{mitreSubTechnique}</div>
               </div>
             </InfoBox>
             <div style={{ height: 10 }} />
             <InfoBox>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
                 <span style={{ color: '#99a3b8', fontSize: 10 }}>Confidence</span>
-                <span style={{ color: '#ff4058', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 900 }}>{confidenceLabel}</span>
+                <span style={{ color: confidenceTextColor, fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 900 }}>{confidenceLabel}</span>
               </div>
             </InfoBox>
 
@@ -502,8 +568,8 @@ export default function InvestigateSummary() {
           </div>
         </aside>
         {/* Main Pannel */}
-        <main style={{ display: 'grid', gap: 16, minWidth: 100 }}>
-          <section style={{ ...panelStyle, minHeight: 246, padding: 26 }}>
+        <main style={{ display: 'grid', gap: 16, minWidth: 100}}>
+          <section style={{ ...panelStyle, minHeight: 100, padding: 26 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 18 }}>
               <Sparkles size={15} color="#48c7ff" />
               <h2 style={{ margin: 0, color: '#ffffff', fontSize: 13, fontWeight: 800 }}>Agent Analysis Summary</h2>
@@ -511,10 +577,10 @@ export default function InvestigateSummary() {
             <p style={{ margin: '0 0 18px', maxWidth: 520, color: '#c3cad9', fontFamily: 'JetBrains Mono, monospace', fontSize: 12, lineHeight: 1.6, whiteSpace: 'pre-wrap' }}>
               {analysisSummary}
             </p>
-            <div style={{ display: 'flex', alignItems: 'end', gap: 26 }}>
+            <div style={{ display: 'flex', alignItems: 'end', gap: 24 }}>
               <div>
                 <div style={{ color: '#99a3b8', fontSize: 10, marginBottom: 6 }}>Verdict</div>
-                <Chip tone="red">{verdict === 'Malicious' ? 'o Malicious' : verdict}</Chip>
+                <Chip tone={verdictDisplay.tone}>{verdictDisplay.label}</Chip>
               </div>
             </div>
           </section>
